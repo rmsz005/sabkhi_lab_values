@@ -6,7 +6,7 @@ apache:
   ingress:
     enabled: true
     ingressClassName: nginx  # Uses existing NGINX Ingress
-    # hostname: hello-world.example.com
+    hostname: hello-world.internal.rmsz005.com
     path: /
     annotations:
       nginx.ingress.kubernetes.io/rewrite-target: /$1
