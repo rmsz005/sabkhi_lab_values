@@ -8,5 +8,5 @@ apache:
     ingressClassName: nginx  # Uses existing NGINX Ingress
     # hostname: hello-world.example.com
     path: /
-    # annotations:
-    #   nginx.ingress.kubernetes.io/rewrite-target: /$1
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
