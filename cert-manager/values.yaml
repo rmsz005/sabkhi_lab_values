@@ -1,2 +1,13 @@
 cert-manager:
   installCRDs: true
+
+clusterIssuer:
+  enabled: true
+  name: letsencrypt
+  email: ramzy.sabkhi@gmail.com 
+  server: https://acme-v02.api.letsencrypt.org/directory
+  cloudflare:
+    email: ramzy.sabkhi@gmail.com  
+    apiTokenSecretRef:
+      name: cloudflare-api-secret
+      key: api-token

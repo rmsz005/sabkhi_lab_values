@@ -5,8 +5,16 @@ apache:
     type: ClusterIP
   ingress:
     enabled: true
-    ingressClassName: nginx  # Uses existing NGINX Ingress
+    ingressClassName: nginx
     hostname: hello-world.internal.rmsz005.com
     path: /
     annotations:
       nginx.ingress.kubernetes.io/rewrite-target: /$1
+      # Add cert-manager annotations for TLS
+      cert-manager.io/cluster-issuer: "letsencrypt"
+      cert-manager.io/common-name: "hello-world.internal.rmsz005.com"
+    tls:
+      enabled: true
+      secretName: "hello-world-tls"
+      hosts:
+        - hello-world.internal.rmsz005.com
