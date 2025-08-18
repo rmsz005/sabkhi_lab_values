@@ -1,0 +1,7 @@
+apiVersion: v2
+name: metallb-wrapper
+version: 0.1.0
+dependencies:
+- name: metallb
+  version: "0.15.2"  # Check latest at https://artifacthub.io/packages/helm/metallb/metallb
+  repository: "https://metallb.github.io/metallb"

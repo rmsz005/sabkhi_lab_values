@@ -1,0 +1,11 @@
+---
+controller:
+  enabled: true
+  image:
+    tag: v0.15.2
+  logLevel: info
+speaker:
+  enabled: true
+  image:
+    tag: v0.15.2
+  logLevel: info

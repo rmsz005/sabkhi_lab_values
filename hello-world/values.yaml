@@ -1,0 +1,12 @@
+---
+apache:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: true
+    ingressClassName: nginx  # Uses existing NGINX Ingress
+    hostname: hello-world.example.com
+    path: /
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
