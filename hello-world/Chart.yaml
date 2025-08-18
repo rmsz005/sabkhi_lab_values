@@ -3,5 +3,5 @@ name: hello-world-wrapper
 version: 0.1.0
 dependencies:
 - name: apache
-  version: "10.4.2"  # Check latest at https://artifacthub.io/packages/helm/bitnami/apache
+  version: "11.4.28"  # Check latest at https://artifacthub.io/packages/helm/bitnami/apache
   repository: "https://charts.bitnami.com/bitnami"
