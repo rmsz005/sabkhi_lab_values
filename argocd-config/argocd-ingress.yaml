@@ -5,9 +5,7 @@ metadata:
   name: argocd-ingress
   namespace: argocd
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    nginx.ingress.kubernetes.io/use-regex: "true"
     cert-manager.io/cluster-issuer: "letsencrypt"
     cert-manager.io/common-name: "argocd.internal.rmsz005.com"
 spec:
@@ -26,11 +24,4 @@ spec:
           service:
             name: argocd-server
             port:
-              number: 80  # Changed from 443 to 80
-      - path: /(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: argocd-server
-            port:
-              number: 80  # Changed from 443 to 80
+              number: 80
