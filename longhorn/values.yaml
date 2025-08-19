@@ -1,0 +1,12 @@
+---
+longhorn:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    host: longhorn.internal.rmsz005.com
+    tls: true
+    tlsSecret: longhorn-tls
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt"
+      cert-manager.io/common-name: "longhorn.internal.rmsz005.com"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
