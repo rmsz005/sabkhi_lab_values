@@ -5,15 +5,18 @@ metadata:
   name: argocd-ingress
   namespace: argocd
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # Fix the rewrite-target for ArgoCD SPA
+    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    # Key annotations for ArgoCD's internal TLS
+    # HTTPS backend for ArgoCD
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/backend-protocol-version: "HTTP/1.1"
-    # Skip TLS verification for internal backend
     nginx.ingress.kubernetes.io/backend-protocol-https-verify: "false"
-    # Use your external certificate
+    # Add these annotations for proper SPA routing
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   try_files $uri $uri/ /index.html;
+    nginx.ingress.kubernetes.io/use-regex: "true"
     cert-manager.io/cluster-issuer: "letsencrypt"
     cert-manager.io/common-name: "argocd.internal.rmsz005.com"
 spec:
@@ -32,4 +35,12 @@ spec:
           service:
             name: argocd-server
             port:
-              number: 443  # Changed to 443 since ArgoCD serves HTTPS internally
+              number: 443
+      # Add this path for ArgoCD assets
+      - path: /(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: argocd-server
+            port:
+              number: 443
