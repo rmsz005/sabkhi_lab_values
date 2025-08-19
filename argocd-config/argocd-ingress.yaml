@@ -14,8 +14,8 @@ metadata:
     nginx.ingress.kubernetes.io/backend-protocol-version: "HTTP/1.1"
     nginx.ingress.kubernetes.io/backend-protocol-https-verify: "false"
     # Add these annotations for proper SPA routing
-    # nginx.ingress.kubernetes.io/configuration-snippet: |
-    #   try_files $uri $uri/ /index.html;
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      try_files $uri $uri/ ;
     nginx.ingress.kubernetes.io/use-regex: "true"
     cert-manager.io/cluster-issuer: "letsencrypt"
     cert-manager.io/common-name: "argocd.internal.rmsz005.com"
