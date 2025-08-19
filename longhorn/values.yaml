@@ -1,5 +1,7 @@
 ---
 longhorn:
+  preUpgradeHook:
+    jobEnabled: false
   ingress:
     enabled: true
     ingressClassName: nginx
