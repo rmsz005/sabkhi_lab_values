@@ -1,2 +1,8 @@
 namespace: kyverno
 
+# Exclude argocd namespace from webhook validation to prevent blocking Argo operations
+webhookConfig:
+  excludeNamespaces:
+    - kyverno
+    - argocd
+
