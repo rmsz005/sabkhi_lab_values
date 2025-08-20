@@ -1,0 +1,64 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-argocd-managed
+  annotations:
+    policies.kyverno.io/title: Require ArgoCD Management (Audit Only)
+    policies.kyverno.io/category: GitOps
+    policies.kyverno.io/severity: medium
+    pod-policies.kyverno.io/autogen-controllers: Deployments,DaemonSet,StatefulSet,Job,CronJob
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+    - name: allow-argocd-sa
+      match:
+        any:
+          - resources:
+              kinds:
+                - '*'
+      preconditions:
+        all:
+          - key: "{{ request.userInfo.username }}"
+            operator: Equals
+            value: "system:serviceaccount:argocd:argocd-application-controller"
+      validate:
+        message: "Argo CD application controller is allowed"
+        pattern:
+          metadata:
+            name: "*"
+    - name: enforce-managed-by-argocd
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+                - StatefulSet
+                - DaemonSet
+                - CronJob
+                - Service
+                - ConfigMap
+                - Secret
+                - Ingress
+                - Role
+                - RoleBinding
+                - ClusterRole
+                - ClusterRoleBinding
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - ingress-nginx
+                - local-path-storage
+      validate:
+        message: "Resources must declare app.kubernetes.io/managed-by=argocd or be created by Argo CD"
+        anyPattern:
+          - metadata:
+              labels:
+                app.kubernetes.io/managed-by: argocd
+
