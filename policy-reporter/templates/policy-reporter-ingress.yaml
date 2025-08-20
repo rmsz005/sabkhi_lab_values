@@ -1,0 +1,30 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: policy-reporter-ingress
+  namespace: policy-reporter
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    cert-manager.io/common-name: "policy-reporter.internal.rmsz005.com"
+  labels:
+    app.kubernetes.io/name: policy-reporter
+    app.kubernetes.io/managed-by: argocd
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - policy-reporter.internal.rmsz005.com
+    secretName: policy-reporter-tls
+  rules:
+  - host: policy-reporter.internal.rmsz005.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: policy-reporter
+            port:
+              number: 8080
