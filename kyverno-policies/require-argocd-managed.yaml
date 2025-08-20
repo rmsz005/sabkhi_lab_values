@@ -10,7 +10,7 @@ metadata:
     pod-policies.kyverno.io/autogen-controllers: Deployments,DaemonSet,StatefulSet,Job,CronJob
 spec:
   validationFailureAction: audit
-  background: true
+  background: false
   rules:
     - name: allow-argocd-sa
       match:
