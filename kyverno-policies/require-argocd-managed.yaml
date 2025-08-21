@@ -57,7 +57,7 @@ spec:
                 - local-path-storage
                 - cert-manager
                 - metallb-system
-                - longhorn-system
+                - longhorn
       validate:
         message: "Resources must declare app.kubernetes.io/managed-by=argocd or be created by Argo CD"
         anyPattern:
