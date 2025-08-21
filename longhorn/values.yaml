@@ -2,6 +2,9 @@
 longhorn:
   helmPreUpgradeCheckerJob:
     enabled: false
+  preUpgradeChecker:
+    jobEnabled: false
+    upgradeVersionCheck: false
   ingress:
     enabled: true
     ingressClassName: nginx
