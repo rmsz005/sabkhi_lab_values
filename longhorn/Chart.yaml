@@ -3,5 +3,5 @@ name: longhorn-wrapper
 version: 0.1.0
 dependencies:
 - name: longhorn
-  version: "1.7.2" 
+  version: "1.9.1" 
   repository: "https://charts.longhorn.io"
