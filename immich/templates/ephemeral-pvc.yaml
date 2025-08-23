@@ -1,0 +1,30 @@
+---
+# Ephemeral PV for testing
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-ephemeral-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: ""
+  hostPath:
+    path: /tmp/immich-ephemeral
+---
+# Ephemeral PVC for testing
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-ephemeral-pvc
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: ""
+  # This will bind to the ephemeral PV above

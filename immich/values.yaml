@@ -5,14 +5,11 @@ immich:
   image:
     tag: "v1.139.2"
   
-  # Use ephemeral storage for testing - emptyDir volumes
+  # Use ephemeral storage for testing - existing PVC with emptyDir
   persistence:
     library:
       enabled: true
-      existingClaim: ""
-      storageClass: ""
-      accessMode: ReadWriteOnce
-      size: 10Gi
+      existingClaim: "immich-ephemeral-pvc"
 
   # Server configuration with ingress
   server:
@@ -59,9 +56,7 @@ postgresql:
           userPasswordKey: "password"
   primary:
     persistence:
-      enabled: true
-      storageClass: ""
-      size: 1Gi
+      enabled: false
     initdb:
       scripts:
         create-extensions.sql: |
@@ -77,6 +72,4 @@ redis:
     enabled: false
   master:
     persistence:
-      enabled: true
-      storageClass: ""
-      size: 1Gi
+      enabled: false
