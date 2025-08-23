@@ -29,14 +29,24 @@ immich:
 image:
   tag: "v1.139.2"
 
-# Use external PostgreSQL or disable for testing
+# Enable PostgreSQL with ephemeral storage for testing
 postgresql:
-  enabled: false
-
-# Alternative: Use the new chart structure for PostgreSQL
-# For testing, we'll disable PostgreSQL and let Immich use SQLite
-env:
-  DB_HOSTNAME: ""
+  enabled: true
+  global:
+    postgresql:
+      auth:
+        username: immich
+        database: immich
+        password: immich-test-password
+  primary:
+    persistence:
+      enabled: false
+    initdb:
+      scripts:
+        create-extensions.sql: |
+          CREATE EXTENSION IF NOT EXISTS cube;
+          CREATE EXTENSION IF NOT EXISTS earthdistance;
+          CREATE EXTENSION IF NOT EXISTS vectors;
 
 redis:
   enabled: true
