@@ -40,6 +40,8 @@ spec:
               key: password
         - name: POSTGRES_DB
           value: immich
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"  # Use subdirectory to avoid lost+found issues
         # PostgreSQL Performance Tuning
         - name: POSTGRES_INITDB_ARGS
           value: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
