@@ -1,20 +1,14 @@
 ---
-# Immich configuration following sabkhi lab patterns
+# Immich configuration with wrapper chart structure
 immich:
-  # Use latest stable image
-  image:
-    tag: "v1.139.2"
-  
-  # Use ephemeral storage for testing - existing PVC with emptyDir
   persistence:
     library:
       existingClaim: "immich-ephemeral-pvc"
 
-  # Server configuration with ingress
+  image:
+    tag: "v1.139.2"
+
   server:
-    enabled: true
-    image:
-      repository: ghcr.io/immich-app/immich-server
     ingress:
       main:
         enabled: true
@@ -35,13 +29,6 @@ immich:
               - immich.internal.rmsz005.com
             secretName: immich-tls
 
-  # Machine Learning service
-  machine-learning:
-    enabled: true
-    image:
-      repository: ghcr.io/immich-app/immich-machine-learning
-
-# PostgreSQL configuration
 postgresql:
   enabled: true
   global:
@@ -56,14 +43,7 @@ postgresql:
   primary:
     persistence:
       enabled: false
-    initdb:
-      scripts:
-        create-extensions.sql: |
-          CREATE EXTENSION IF NOT EXISTS cube;
-          CREATE EXTENSION IF NOT EXISTS earthdistance;
-          CREATE EXTENSION IF NOT EXISTS vectors;
 
-# Redis configuration
 redis:
   enabled: true
   architecture: standalone

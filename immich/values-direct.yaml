@@ -1,0 +1,53 @@
+---
+# Direct Immich configuration (no wrapper)
+persistence:
+  library:
+    existingClaim: "immich-ephemeral-pvc"
+
+image:
+  tag: "v1.139.2"
+
+server:
+  ingress:
+    main:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+        cert-manager.io/cluster-issuer: "letsencrypt"
+        cert-manager.io/common-name: "immich.internal.rmsz005.com"
+      hosts:
+        - host: immich.internal.rmsz005.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - immich.internal.rmsz005.com
+          secretName: immich-tls
+
+postgresql:
+  enabled: true
+  global:
+    postgresql:
+      auth:
+        username: immich
+        database: immich
+        existingSecret: ""
+        secretKeys:
+          adminPasswordKey: "postgres-password"
+          userPasswordKey: "password"
+  primary:
+    persistence:
+      enabled: false
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
