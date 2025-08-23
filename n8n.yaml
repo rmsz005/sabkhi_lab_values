@@ -1,19 +1,19 @@
 ---
-# N8n Workflow Automation Configuration
+# N8n Community Charts Configuration
+# https://github.com/community-charts/helm-charts/tree/main/charts/n8n
 
-# Deployment configuration
-replicaCount: 1
-
+# Image configuration
 image:
   repository: n8nio/n8n
   pullPolicy: IfNotPresent
   tag: "1.107.4"
 
-# Service configuration
+# Service configuration  
 service:
+  enabled: true
   type: ClusterIP
-  port: 80
-  targetPort: 5678
+  port: 5678
+  name: http
 
 # Ingress configuration with TLS
 ingress:
@@ -30,7 +30,7 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-    - host: "" # Catch-all rule for direct IP access
+    - host: ""  # Catch-all rule for direct IP access
       paths:
         - path: /n8n
           pathType: Prefix
@@ -39,124 +39,159 @@ ingress:
         - n8n.internal.rmsz005.com
       secretName: n8n-tls
 
-# Persistence configuration using Longhorn
-persistence:
-  enabled: true
-  type: pvc
-  size: 10Gi
-  storageClass: "longhorn-ssd-replicated"
-  accessModes:
-    - ReadWriteOnce
+# Database configuration (SQLite for simplicity)
+db:
+  type: sqlite
+  tablePrefix: ""
+  sqlite:
+    database: "database.sqlite"
+    poolSize: 0
+    vacuum: false
 
-# Resource configuration for production
-resources:
-  requests:
-    memory: "512Mi"
-    cpu: "250m"
-  limits:
-    memory: "2Gi"
-    cpu: "1000m"
+# Main node configuration
+main:
+  # Single replica for now
+  count: 1
+  
+  # Pod Disruption Budget
+  pdb:
+    enabled: false
+    minAvailable: 1
 
-# N8n configuration
-config:
-  database:
-    type: "sqlite"
-    sqlite:
-      database: "/home/node/.n8n/database.sqlite"
-  
-  # Encryption key from sealed secret
-  encryptionKey:
-    valueFrom:
-      secretKeyRef:
-        name: n8n-encryption-secret
-        key: encryption-key
-  
-  # Basic configuration
-  generic:
-    timezone: "UTC"
-  
-  # Security settings
-  security:
-    basicAuth:
-      active: false  # We'll rely on ingress for authentication
-  
-  # Execution settings
-  executions:
-    mode: "regular"
-    timeout: 3600
-    maxTimeout: 3600
-    saveDataOnError: "all"
-    saveDataOnSuccess: "all"
-    saveDataManualExecutions: true
-  
-  # Node.js settings
-  nodeFunction:
-    allowBuiltin: "*"
-    allowExternal: "*"
+  # Resources
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
 
-# Environment variables
-env:
-  N8N_HOST: "n8n.internal.rmsz005.com"
-  N8N_PORT: "5678"
-  N8N_PROTOCOL: "https"
-  WEBHOOK_URL: "https://n8n.internal.rmsz005.com/"
-  N8N_LOG_LEVEL: "info"
-  N8N_METRICS: "true"
-  NODE_ENV: "production"
+  # Persistence using Longhorn SSD
+  persistence:
+    enabled: true
+    mountPath: "/home/node/.n8n"
+    storageClass: "longhorn-ssd-replicated"
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    annotations:
+      helm.sh/resource-policy: keep
 
-# Security context
-securityContext:
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  fsGroup: 1000
+  # Health probes
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: "http"
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
 
-# Pod security context
+  readinessProbe:
+    httpGet:
+      path: /healthz/readiness
+      port: "http"
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  # Environment variables for n8n configuration
+  extraEnvVars:
+    N8N_HOST: "n8n.internal.rmsz005.com"
+    N8N_PORT: "5678"
+    N8N_PROTOCOL: "https"
+    WEBHOOK_URL: "https://n8n.internal.rmsz005.com/"
+    N8N_LOG_LEVEL: "info"
+    N8N_METRICS: "true"
+    NODE_ENV: "production"
+
+  # Reference to sealed secrets for environment variables
+  extraSecretNamesForEnvFrom:
+    - n8n-encryption-secret
+
+# Security contexts
 podSecurityContext:
+  fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
   runAsNonRoot: true
+  privileged: false
   runAsUser: 1000
   runAsGroup: 1000
-  fsGroup: 1000
-
-# Health checks
-livenessProbe:
-  httpGet:
-    path: /healthz
-    port: 5678
-  initialDelaySeconds: 60
-  periodSeconds: 30
-  timeoutSeconds: 10
-  failureThreshold: 3
-
-readinessProbe:
-  httpGet:
-    path: /healthz
-    port: 5678
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
-
-# Node selector to prefer SSD nodes for better performance
-nodeSelector: {}
-
-# Tolerations and affinity
-tolerations: []
-affinity: {}
 
 # Service account
 serviceAccount:
   create: true
+  automount: true
   annotations: {}
   name: "n8n"
 
-# Pod annotations
+# Pod annotations for monitoring
 podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "5678"
   prometheus.io/path: "/metrics"
 
-# Pod disruption budget for high availability
-podDisruptionBudget:
-  enabled: false  # Set to true if running multiple replicas
-  minAvailable: 1
+# Logging configuration
+log:
+  level: info
+  output:
+    - console
+
+# Node configurations
+nodes:
+  builtin:
+    enabled: true
+    modules:
+      - "*"
+  external:
+    allowAll: true
+    reinstallMissingPackages: false
+
+# API configuration
+api:
+  enabled: true
+  path: api
+  swagger:
+    enabled: true
+
+# Diagnostics and telemetry (disabled for privacy)
+diagnostics:
+  enabled: false
+
+versionNotifications:
+  enabled: false
+
+# License configuration (community version)
+license:
+  enabled: false
+
+# External services (disabled, using defaults)
+redis:
+  enabled: false
+
+postgresql:
+  enabled: false
+
+minio:
+  enabled: false
+
+# Monitoring
+serviceMonitor:
+  enabled: false
+
+# Node scheduling
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# DNS configuration
+dnsPolicy: ""
+dnsConfig: {}
