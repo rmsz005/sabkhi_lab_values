@@ -5,26 +5,26 @@ immich:
     library:
       existingClaim: "immich-ephemeral-pvc"
 
-  server:
-    ingress:
-      main:
-        enabled: true
-        ingressClassName: nginx
-        annotations:
-          nginx.ingress.kubernetes.io/proxy-body-size: "0"
-          nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-          nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-          cert-manager.io/cluster-issuer: "letsencrypt"
-          cert-manager.io/common-name: "immich.internal.rmsz005.com"
-        hosts:
-          - host: immich.internal.rmsz005.com
-            paths:
-              - path: /
-                pathType: Prefix
-        tls:
-          - hosts:
-              - immich.internal.rmsz005.com
-            secretName: immich-tls
+server:
+  ingress:
+    main:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+        cert-manager.io/cluster-issuer: "letsencrypt"
+        cert-manager.io/common-name: "immich.internal.rmsz005.com"
+      hosts:
+        - host: immich.internal.rmsz005.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - immich.internal.rmsz005.com
+          secretName: immich-tls
 
 image:
   tag: "v1.139.2"
