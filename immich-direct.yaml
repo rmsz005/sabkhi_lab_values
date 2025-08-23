@@ -1,5 +1,5 @@
 ---
-# Direct Immich configuration (no wrapper)
+# Direct Immich chart configuration (no wrapper)
 persistence:
   library:
     existingClaim: "immich-ephemeral-pvc"
@@ -51,3 +51,31 @@ redis:
   master:
     persistence:
       enabled: false
+
+# Create the required ephemeral PVC
+extraManifests:
+  - apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: immich-ephemeral-pv
+    spec:
+      capacity:
+        storage: 10Gi
+      accessModes:
+        - ReadWriteOnce
+      persistentVolumeReclaimPolicy: Delete
+      storageClassName: ""
+      hostPath:
+        path: /tmp/immich-ephemeral
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: immich-ephemeral-pvc
+      namespace: immich
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: ""
