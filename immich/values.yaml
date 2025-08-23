@@ -5,10 +5,14 @@ immich:
   image:
     tag: "v1.139.2"
   
-  # Disable persistence for testing - ephemeral storage
+  # Use ephemeral storage for testing - emptyDir volumes
   persistence:
     library:
-      enabled: false
+      enabled: true
+      existingClaim: ""
+      storageClass: ""
+      accessMode: ReadWriteOnce
+      size: 10Gi
 
   # Server configuration with ingress
   server:
@@ -55,7 +59,9 @@ postgresql:
           userPasswordKey: "password"
   primary:
     persistence:
-      enabled: false
+      enabled: true
+      storageClass: ""
+      size: 1Gi
     initdb:
       scripts:
         create-extensions.sql: |
@@ -71,4 +77,6 @@ redis:
     enabled: false
   master:
     persistence:
-      enabled: false
+      enabled: true
+      storageClass: ""
+      size: 1Gi
