@@ -1,0 +1,74 @@
+---
+# Immich configuration following sabkhi lab patterns
+immich:
+  # Use latest stable image
+  image:
+    tag: "v1.139.2"
+  
+  # Disable persistence for testing - ephemeral storage
+  persistence:
+    library:
+      enabled: false
+
+  # Server configuration with ingress
+  server:
+    enabled: true
+    image:
+      repository: ghcr.io/immich-app/immich-server
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+          nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+          cert-manager.io/cluster-issuer: "letsencrypt"
+          cert-manager.io/common-name: "immich.internal.rmsz005.com"
+        hosts:
+          - host: immich.internal.rmsz005.com
+            paths:
+              - path: /
+                pathType: Prefix
+        tls:
+          - hosts:
+              - immich.internal.rmsz005.com
+            secretName: immich-tls
+
+  # Machine Learning service
+  machine-learning:
+    enabled: true
+    image:
+      repository: ghcr.io/immich-app/immich-machine-learning
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  global:
+    postgresql:
+      auth:
+        username: immich
+        database: immich
+        existingSecret: ""
+        secretKeys:
+          adminPasswordKey: "postgres-password"
+          userPasswordKey: "password"
+  primary:
+    persistence:
+      enabled: false
+    initdb:
+      scripts:
+        create-extensions.sql: |
+          CREATE EXTENSION IF NOT EXISTS cube;
+          CREATE EXTENSION IF NOT EXISTS earthdistance;
+          CREATE EXTENSION IF NOT EXISTS vectors;
+
+# Redis configuration
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
