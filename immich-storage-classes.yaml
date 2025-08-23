@@ -13,10 +13,7 @@ volumeBindingMode: WaitForFirstConsumer  # Better for specific disk requirements
 parameters:
   numberOfReplicas: "2"
   staleReplicaTimeout: "2880"  # 48 hours
-  fromBackup: ""
   diskSelector: "hd"
-  nodeSelector: ""
-  recurringJobSelector: ""
   dataLocality: "disabled"  # OK for library storage
 ---
 # NVMe Storage Class for PostgreSQL (Primary choice)
@@ -34,10 +31,7 @@ volumeBindingMode: WaitForFirstConsumer  # Better for specific disk requirements
 parameters:
   numberOfReplicas: "2"
   staleReplicaTimeout: "2880"  # 48 hours
-  fromBackup: ""
   diskSelector: "nvme"
-  nodeSelector: ""
-  recurringJobSelector: ""
   dataLocality: "best-effort"  # Better PostgreSQL performance
 ---
 # SSD Storage Class for PostgreSQL (Fallback choice)
@@ -55,8 +49,5 @@ volumeBindingMode: WaitForFirstConsumer
 parameters:
   numberOfReplicas: "2"
   staleReplicaTimeout: "2880"  # 48 hours
-  fromBackup: ""
   diskSelector: "ssd"
-  nodeSelector: ""
-  recurringJobSelector: ""
   dataLocality: "best-effort"
