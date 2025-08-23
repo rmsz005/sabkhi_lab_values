@@ -1,0 +1,28 @@
+---
+# Immich Library Storage - 1TB HD with 2 replicas
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-library-pvc
+  namespace: immich
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: longhorn-hd-replicated
+---
+# PostgreSQL Storage - 20GB NVMe (sufficient for production) with 2 replicas
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-postgresql-pvc
+  namespace: immich
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi  # Increased for production use
+  storageClassName: longhorn-nvme-replicated  # Try NVMe first

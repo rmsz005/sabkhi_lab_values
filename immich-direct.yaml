@@ -3,7 +3,26 @@
 immich:
   persistence:
     library:
-      existingClaim: "immich-ephemeral-pvc"
+      existingClaim: "immich-library-pvc"
+
+image:
+  tag: "v1.139.2"
+
+# Use external PostgreSQL (deprecated subchart)
+postgresql:
+  enabled: false
+
+# Override environment variables for external PostgreSQL
+env:
+  DB_HOSTNAME: "immich-postgresql"
+  DB_USERNAME: "immich"
+  DB_DATABASE_NAME: "immich"
+  # Redis Configuration
+  REDIS_HOSTNAME: "immich-redis-master"
+  REDIS_PORT: "6379"
+  # Production tuning
+  NODE_ENV: "production"
+  LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
 
 server:
   ingress:
@@ -29,28 +48,55 @@ server:
         - hosts:
             - immich.internal.rmsz005.com
           secretName: immich-tls
+  # Load sensitive environment variables from Secrets
+  extraEnvFrom:
+    - secretRef:
+        name: immich-postgresql-secret
+    - secretRef:
+        name: immich-redis-secret
 
-image:
-  tag: "v1.139.2"
-
-# Use external PostgreSQL (deprecated subchart)
-postgresql:
-  enabled: false
-
-# Override environment variables for external PostgreSQL
-env:
-  DB_HOSTNAME: "immich-postgresql"
-  DB_USERNAME: "immich"
-  DB_PASSWORD: "immich-test-password"
-  DB_DATABASE_NAME: "immich"
+# Resource management for Immich pods
+resources:
+  server:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+  microservices:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+  machine-learning:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "6Gi"
+      cpu: "3000m"
 
 redis:
   enabled: true
   architecture: standalone
   auth:
-    enabled: false
+    enabled: true
+    existingSecret: immich-redis-secret
+    existingSecretPasswordKey: password
   master:
     persistence:
-      enabled: false
+      enabled: true
+      size: 1Gi
+      storageClass: "longhorn-ssd-replicated"  # Fast storage for cache
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
 
 # PVC is created by immich-storage ArgoCD application

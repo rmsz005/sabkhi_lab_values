@@ -1,0 +1,62 @@
+---
+# HD Storage Class for Immich Library (1TB with 2 replicas)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-hd-replicated
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer  # Better for specific disk requirements  
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"  # 48 hours
+  fromBackup: ""
+  diskSelector: "hd"
+  nodeSelector: ""
+  recurringJobSelector: ""
+  dataLocality: "disabled"  # OK for library storage
+---
+# NVMe Storage Class for PostgreSQL (Primary choice)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-nvme-replicated
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "NVMe storage for maximum PostgreSQL performance"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer  # Better for specific disk requirements
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"  # 48 hours
+  fromBackup: ""
+  diskSelector: "nvme"
+  nodeSelector: ""
+  recurringJobSelector: ""
+  dataLocality: "best-effort"  # Better PostgreSQL performance
+---
+# SSD Storage Class for PostgreSQL (Fallback choice)
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-ssd-replicated
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false" 
+    description: "SSD storage fallback for PostgreSQL"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"  # 48 hours
+  fromBackup: ""
+  diskSelector: "ssd"
+  nodeSelector: ""
+  recurringJobSelector: ""
+  dataLocality: "best-effort"
