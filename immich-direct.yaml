@@ -23,13 +23,17 @@ env:
   # Production tuning
   NODE_ENV: "production"
   LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
-
-# Load sensitive environment variables from Secrets at global level
-envFrom:
-  - secretRef:
-      name: immich-postgresql-secret
-  - secretRef:
-      name: immich-redis-secret
+  # Load from secrets explicitly
+  DB_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: immich-postgresql-secret
+        key: password
+  REDIS_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: immich-redis-secret
+        key: password
 
 server:
   ingress:
