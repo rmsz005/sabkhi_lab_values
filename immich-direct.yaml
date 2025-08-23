@@ -29,24 +29,16 @@ immich:
 image:
   tag: "v1.139.2"
 
-# Enable PostgreSQL with ephemeral storage for testing
+# Use external PostgreSQL (deprecated subchart)
 postgresql:
-  enabled: true
-  global:
-    postgresql:
-      auth:
-        username: immich
-        database: immich
-        password: immich-test-password
-  primary:
-    persistence:
-      enabled: false
-    initdb:
-      scripts:
-        create-extensions.sql: |
-          CREATE EXTENSION IF NOT EXISTS cube;
-          CREATE EXTENSION IF NOT EXISTS earthdistance;
-          CREATE EXTENSION IF NOT EXISTS vectors;
+  enabled: false
+
+# Override environment variables for external PostgreSQL
+env:
+  DB_HOSTNAME: "immich-postgresql"
+  DB_USERNAME: "immich"
+  DB_PASSWORD: "immich-test-password"
+  DB_DATABASE_NAME: "immich"
 
 redis:
   enabled: true
