@@ -8,7 +8,6 @@ immich:
   # Use ephemeral storage for testing - existing PVC with emptyDir
   persistence:
     library:
-      enabled: true
       existingClaim: "immich-ephemeral-pvc"
 
   # Server configuration with ingress
