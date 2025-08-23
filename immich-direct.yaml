@@ -24,6 +24,13 @@ env:
   NODE_ENV: "production"
   LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
 
+# Load sensitive environment variables from Secrets at global level
+envFrom:
+  - secretRef:
+      name: immich-postgresql-secret
+  - secretRef:
+      name: immich-redis-secret
+
 server:
   ingress:
     main:
@@ -48,12 +55,6 @@ server:
         - hosts:
             - immich.internal.rmsz005.com
           secretName: immich-tls
-  # Load sensitive environment variables from Secrets
-  extraEnvFrom:
-    - secretRef:
-        name: immich-postgresql-secret
-    - secretRef:
-        name: immich-redis-secret
 
 # Resource management for Immich pods
 resources:
