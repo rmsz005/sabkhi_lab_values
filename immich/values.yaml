@@ -66,32 +66,23 @@ server:
           secretName: immich-tls
 
 # Resource management for Immich pods - optimized for autoscaling
-resources:
-  server:
+server:
+  resources:
     requests:
       memory: "1Gi"
       cpu: "500m"
     limits:
       memory: "6Gi"     # Increased to handle upload spikes
       cpu: "3000m"      # Increased to handle processing load
-  microservices:
-    requests:
-      memory: "2Gi"
-      cpu: "1000m"
-    limits:
-      memory: "8Gi"
-      cpu: "4000m"
-  machine-learning:
+
+machine-learning:
+  resources:
     requests:
       memory: "2Gi"
       cpu: "1000m"
     limits:
       memory: "6Gi"
       cpu: "3000m"
-
-# Replica configuration for autoscaling
-replicaCount:
-  server: 1  # HPA will manage this automatically
 
 redis:
   enabled: true
