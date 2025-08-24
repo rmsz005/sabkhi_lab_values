@@ -4,22 +4,6 @@ immich:
   persistence:
     library:
       existingClaim: "immich-library-pvc"
-  server:
-    resources:
-      requests:
-        memory: "1Gi"
-        cpu: "500m"
-      limits:
-        memory: "6Gi"
-        cpu: "3000m"
-  machine-learning:
-    resources:
-      requests:
-        memory: "2Gi"
-        cpu: "1000m"
-      limits:
-        memory: "6Gi"
-        cpu: "3000m"
 
 image:
   tag: "v1.139.2"
@@ -39,11 +23,6 @@ env:
   # Production tuning
   NODE_ENV: "production"
   LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
-  # Upload optimization
-  IMMICH_WORKERS_INCLUDE: "api"
-  IMMICH_API_METRICS_PORT: "8081"
-  # Concurrency settings for large uploads
-  IMMICH_MEDIA_LOCATION: "/usr/src/app/upload"
   # Load from secrets explicitly
   DB_PASSWORD:
     valueFrom:
@@ -81,7 +60,29 @@ server:
             - immich.internal.rmsz005.com
           secretName: immich-tls
 
-# Resource management moved under immich: section above
+# Resource management for Immich pods
+resources:
+  server:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+  microservices:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+  machine-learning:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "6Gi"
+      cpu: "3000m"
 
 redis:
   enabled: true
