@@ -23,6 +23,11 @@ env:
   # Production tuning
   NODE_ENV: "production"
   LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
+  # Transcoding optimization
+  IMMICH_WORKERS_INCLUDE: "api"
+  IMMICH_WORKERS_EXCLUDE: ""
+  # Increase transcoding parallelism
+  FFMPEG_THREADS: "0"  # Use all available CPU cores
   # Load from secrets explicitly
   DB_PASSWORD:
     valueFrom:
@@ -59,6 +64,25 @@ server:
         - hosts:
             - immich.internal.rmsz005.com
           secretName: immich-tls
+
+# Enable microservices architecture for distributed processing
+microservices:
+  enabled: true
+  replicaCount: 3  # Distribute across multiple nodes
+  
+# Pod anti-affinity to spread workloads across nodes
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - immich
+        topologyKey: kubernetes.io/hostname
 
 # Resource management for Immich pods
 resources:
