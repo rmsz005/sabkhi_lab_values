@@ -65,10 +65,15 @@ server:
             - immich.internal.rmsz005.com
           secretName: immich-tls
 
-# Enable microservices architecture for distributed processing
-microservices:
-  enabled: true
-  replicaCount: 3  # Distribute across multiple nodes
+# Scale server replicas for distributed processing  
+server:
+  controller:
+    replicas: 3  # Distribute server workload across multiple nodes
+
+# Scale machine learning for AI workloads
+machine-learning:
+  controller:
+    replicas: 2  # Distribute ML processing
   
 # Pod anti-affinity to spread workloads across nodes
 affinity:
