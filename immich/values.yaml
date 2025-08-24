@@ -41,6 +41,8 @@ env:
         key: password
 
 server:
+  controller:
+    replicas: 3  # Distribute server workload across multiple nodes
   ingress:
     main:
       enabled: true
@@ -64,11 +66,6 @@ server:
         - hosts:
             - immich.internal.rmsz005.com
           secretName: immich-tls
-
-# Scale server replicas for distributed processing  
-server:
-  controller:
-    replicas: 3  # Distribute server workload across multiple nodes
 
 # Scale machine learning for AI workloads
 machine-learning:
