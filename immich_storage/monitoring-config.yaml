@@ -1,0 +1,83 @@
+---
+# ServiceMonitor for Prometheus to scrape Immich metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: immich-server-metrics
+  namespace: immich
+  labels:
+    app.kubernetes.io/name: immich
+    app.kubernetes.io/component: server
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: immich
+      app.kubernetes.io/component: server
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+---
+# PrometheusRule for alerting on high resource usage
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: immich-scaling-alerts
+  namespace: immich
+  labels:
+    app.kubernetes.io/name: immich
+spec:
+  groups:
+  - name: immich.scaling
+    rules:
+    - alert: ImmichHighCPUUsage
+      expr: |
+        (
+          sum(rate(container_cpu_usage_seconds_total{namespace="immich",pod=~"immich-server.*"}[5m])) by (pod) 
+          / 
+          sum(container_spec_cpu_quota{namespace="immich",pod=~"immich-server.*"} / container_spec_cpu_period{namespace="immich",pod=~"immich-server.*"}) by (pod)
+        ) * 100 > 80
+      for: 2m
+      labels:
+        severity: warning
+        component: immich-server
+      annotations:
+        summary: "Immich server has high CPU usage"
+        description: "Immich server pod {{ $labels.pod }} has been using more than 80% CPU for more than 2 minutes."
+    
+    - alert: ImmichHighMemoryUsage
+      expr: |
+        (
+          container_memory_working_set_bytes{namespace="immich",pod=~"immich-server.*"} 
+          / 
+          container_spec_memory_limit_bytes{namespace="immich",pod=~"immich-server.*"}
+        ) * 100 > 85
+      for: 2m
+      labels:
+        severity: warning
+        component: immich-server
+      annotations:
+        summary: "Immich server has high memory usage"
+        description: "Immich server pod {{ $labels.pod }} has been using more than 85% memory for more than 2 minutes."
+    
+    - alert: ImmichScalingEvent
+      expr: |
+        increase(kube_deployment_status_replicas{namespace="immich",deployment="immich-server"}[5m]) > 0
+      for: 0m
+      labels:
+        severity: info
+        component: immich-server
+      annotations:
+        summary: "Immich server has scaled up"
+        description: "Immich server deployment has scaled up due to increased load."
+        
+    - alert: ImmichUploadProcessing
+      expr: |
+        sum(rate(container_cpu_usage_seconds_total{namespace="immich",pod=~"immich-server.*"}[5m])) > 2
+      for: 5m
+      labels:
+        severity: info
+        component: immich-server
+      annotations:
+        summary: "Immich is processing large upload"
+        description: "Immich server is consuming significant CPU, likely processing a large upload batch."

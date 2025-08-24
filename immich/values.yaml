@@ -23,6 +23,11 @@ env:
   # Production tuning
   NODE_ENV: "production"
   LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
+  # Upload optimization
+  IMMICH_WORKERS_INCLUDE: "api"
+  IMMICH_API_METRICS_PORT: "8081"
+  # Concurrency settings for large uploads
+  IMMICH_MEDIA_LOCATION: "/usr/src/app/upload"
   # Load from secrets explicitly
   DB_PASSWORD:
     valueFrom:
@@ -60,15 +65,15 @@ server:
             - immich.internal.rmsz005.com
           secretName: immich-tls
 
-# Resource management for Immich pods
+# Resource management for Immich pods - optimized for autoscaling
 resources:
   server:
     requests:
       memory: "1Gi"
       cpu: "500m"
     limits:
-      memory: "4Gi"
-      cpu: "2000m"
+      memory: "6Gi"     # Increased to handle upload spikes
+      cpu: "3000m"      # Increased to handle processing load
   microservices:
     requests:
       memory: "2Gi"
@@ -83,6 +88,10 @@ resources:
     limits:
       memory: "6Gi"
       cpu: "3000m"
+
+# Replica configuration for autoscaling
+replicaCount:
+  server: 1  # HPA will manage this automatically
 
 redis:
   enabled: true

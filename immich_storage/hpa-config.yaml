@@ -1,0 +1,101 @@
+---
+# Horizontal Pod Autoscaler for Immich Server
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: immich-server-hpa
+  namespace: immich
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: immich-server
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60  # Wait 1 minute before scaling up
+      policies:
+      - type: Percent
+        value: 100  # Double the replicas
+        periodSeconds: 60
+      - type: Pods
+        value: 2    # Or add 2 pods max
+        periodSeconds: 60
+      selectPolicy: Min  # Use the more conservative option
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Wait 5 minutes before scaling down
+      policies:
+      - type: Percent
+        value: 50   # Remove half the replicas
+        periodSeconds: 300
+      - type: Pods
+        value: 1    # Or remove 1 pod max
+        periodSeconds: 300
+      selectPolicy: Min  # Use the more conservative option
+---
+# PodDisruptionBudget to ensure availability during scaling
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: immich-server-pdb
+  namespace: immich
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: immich
+      app.kubernetes.io/component: server
+---
+# Optional: HPA for Machine Learning workload (less aggressive)
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: immich-machine-learning-hpa
+  namespace: immich
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: immich-machine-learning
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 180  # Wait 3 minutes before scaling up
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 180
+    scaleDown:
+      stabilizationWindowSeconds: 600  # Wait 10 minutes before scaling down
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 300
