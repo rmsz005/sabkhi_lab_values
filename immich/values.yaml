@@ -66,11 +66,25 @@ server:
         - hosts:
             - immich.internal.rmsz005.com
           secretName: immich-tls
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "6000m"  # Allow more CPU for transcoding bursts
 
 # Scale machine learning for AI workloads
 machine-learning:
   controller:
     replicas: 2  # Distribute ML processing
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "6Gi" 
+      cpu: "3000m"
   
 # Pod anti-affinity to spread workloads across nodes
 affinity:
@@ -85,30 +99,6 @@ affinity:
             values:
             - immich
         topologyKey: kubernetes.io/hostname
-
-# Resource management for Immich pods
-resources:
-  server:
-    requests:
-      memory: "2Gi"
-      cpu: "1000m"
-    limits:
-      memory: "8Gi"
-      cpu: "6000m"  # Allow more CPU for transcoding bursts
-  microservices:
-    requests:
-      memory: "2Gi"
-      cpu: "1000m"
-    limits:
-      memory: "8Gi"
-      cpu: "4000m"
-  machine-learning:
-    requests:
-      memory: "2Gi"
-      cpu: "1000m"
-    limits:
-      memory: "6Gi"
-      cpu: "3000m"
 
 redis:
   enabled: true
