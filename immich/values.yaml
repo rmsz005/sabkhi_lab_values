@@ -42,7 +42,7 @@ env:
 
 server:
   controller:
-    replicas: 3  # Distribute server workload across multiple nodes
+    replicas: 1  # Immich server is stateful - use 1 replica with shared storage
   ingress:
     main:
       enabled: true
@@ -90,11 +90,11 @@ affinity:
 resources:
   server:
     requests:
-      memory: "1Gi"
-      cpu: "500m"
+      memory: "2Gi"
+      cpu: "1000m"
     limits:
-      memory: "4Gi"
-      cpu: "2000m"
+      memory: "8Gi"
+      cpu: "6000m"  # Allow more CPU for transcoding bursts
   microservices:
     requests:
       memory: "2Gi"
