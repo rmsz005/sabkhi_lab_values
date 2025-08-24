@@ -1,0 +1,135 @@
+---
+# Prometheus configuration
+prometheus:
+  prometheusSpec:
+    # Data retention
+    retention: 7d
+    retentionSize: 18GB  # Leave some headroom in 20GB volume
+    
+    # Storage configuration with NVMe and replication
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
+          resources:
+            requests:
+              storage: 20Gi
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 500m
+      limits:
+        memory: 4Gi
+        cpu: 2000m
+    
+    # Enable service monitors for auto-discovery
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+# Grafana configuration  
+grafana:
+  # Enable persistence for dashboards/settings
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
+  
+  # Ingress configuration
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      cert-manager.io/cluster-issuer: "letsencrypt"
+      cert-manager.io/common-name: "grafana.internal.rmsz005.com"
+    hosts:
+      - grafana.internal.rmsz005.com
+    tls:
+      - hosts:
+          - grafana.internal.rmsz005.com
+        secretName: grafana-tls
+  
+  # Admin credentials (change these!)
+  adminPassword: "admin123"  # CHANGE THIS AFTER FIRST LOGIN
+  
+  # Resource allocation
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 200m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+# AlertManager configuration
+alertmanager:
+  alertmanagerSpec:
+    # Storage for alerts
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
+          resources:
+            requests:
+              storage: 2Gi
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
+
+# Node Exporter (hardware metrics)
+nodeExporter:
+  enabled: true
+
+# Kube State Metrics (Kubernetes object metrics)
+kubeStateMetrics:
+  enabled: true
+
+# Default rules and alerts
+defaultRules:
+  create: true
+  rules:
+    # Basic alerting rules
+    etcd: true
+    general: true
+    k8s: true
+    kubeApiserver: true
+    kubePrometheusNodeRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    node: true
+    prometheus: true
+
+# Additional ServiceMonitors to discover existing services
+additionalServiceMonitors:
+  # Monitor nginx-ingress
+  - name: nginx-ingress
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: ingress-nginx
+    endpoints:
+    - port: prometheus
+      path: /metrics
+      interval: 30s
+  
+  # Monitor ArgoCD
+  - name: argocd-metrics
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: argocd-metrics
+    endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
