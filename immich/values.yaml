@@ -4,6 +4,22 @@ immich:
   persistence:
     library:
       existingClaim: "immich-library-pvc"
+  server:
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "6Gi"
+        cpu: "3000m"
+  machine-learning:
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1000m"
+      limits:
+        memory: "6Gi"
+        cpu: "3000m"
 
 image:
   tag: "v1.139.2"
@@ -65,24 +81,7 @@ server:
             - immich.internal.rmsz005.com
           secretName: immich-tls
 
-# Resource management for Immich pods - optimized for autoscaling
-server:
-  resources:
-    requests:
-      memory: "1Gi"
-      cpu: "500m"
-    limits:
-      memory: "6Gi"     # Increased to handle upload spikes
-      cpu: "3000m"      # Increased to handle processing load
-
-machine-learning:
-  resources:
-    requests:
-      memory: "2Gi"
-      cpu: "1000m"
-    limits:
-      memory: "6Gi"
-      cpu: "3000m"
+# Resource management moved under immich: section above
 
 redis:
   enabled: true
