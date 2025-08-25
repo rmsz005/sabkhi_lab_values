@@ -46,7 +46,7 @@ env:
 
 server:
   controller:
-    replicas: 1  # Immich server is stateful - use 1 replica with shared storage
+    replicas: 1  # Immich API server - single replica for API consistency
   # Expose metrics port for Prometheus scraping
   service:
     main:
@@ -81,11 +81,36 @@ server:
           secretName: immich-tls
   resources:
     requests:
-      memory: "2Gi"
+      memory: "1Gi"      # Reduced for API-only workload
+      cpu: "500m"
+    limits:
+      memory: "3Gi"      # API doesn't need as much memory
+      cpu: "2000m"
+
+# Dedicated microservices worker for background jobs
+microservices:
+  enabled: true
+  controller:
+    replicas: 2  # Scale workers for parallel job processing
+  env:
+    # Worker-specific configuration
+    IMMICH_WORKERS_EXCLUDE: "api"  # Handle everything except API
+    # Inherit all other env vars from main env section
+  service:
+    main:
+      ports:
+        metrics:
+          enabled: true
+          port: 8082
+          protocol: TCP
+          targetPort: 8082
+  resources:
+    requests:
+      memory: "2Gi"      # More memory for job processing
       cpu: "1000m"
     limits:
-      memory: "8Gi"
-      cpu: "6000m"  # Allow more CPU for transcoding bursts
+      memory: "6Gi"      # Background jobs need more memory
+      cpu: "4000m"       # More CPU for transcoding and ML tasks
 
 # Scale machine learning for AI workloads
 machine-learning:
@@ -108,7 +133,7 @@ machine-learning:
       memory: "6Gi" 
       cpu: "3000m"
   
-# Pod anti-affinity to spread workloads across nodes
+# Pod anti-affinity to spread different Immich components across nodes
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
@@ -121,6 +146,31 @@ affinity:
             values:
             - immich
         topologyKey: kubernetes.io/hostname
+
+# Separate affinity rules for microservices workers
+microservices:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - microservices
+          topologyKey: kubernetes.io/hostname
+      # Prefer not to run on same node as API server
+      - weight: 50
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - server
+          topologyKey: kubernetes.io/hostname
 
 redis:
   enabled: true
