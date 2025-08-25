@@ -28,6 +28,10 @@ env:
   IMMICH_WORKERS_EXCLUDE: ""
   # Increase transcoding parallelism
   FFMPEG_THREADS: "0"  # Use all available CPU cores
+  # Enable Immich monitoring/telemetry
+  IMMICH_TELEMETRY_INCLUDE: "all"  # Enable all metrics: api, host, io
+  IMMICH_API_METRICS_PORT: "8081"  # Server metrics endpoint
+  IMMICH_MICROSERVICES_METRICS_PORT: "8082"  # ML/microservices metrics
   # Load from secrets explicitly
   DB_PASSWORD:
     valueFrom:
@@ -43,6 +47,15 @@ env:
 server:
   controller:
     replicas: 1  # Immich server is stateful - use 1 replica with shared storage
+  # Expose metrics port for Prometheus scraping
+  service:
+    main:
+      ports:
+        metrics:
+          enabled: true
+          port: 8081
+          protocol: TCP
+          targetPort: 8081
   ingress:
     main:
       enabled: true
@@ -78,6 +91,15 @@ server:
 machine-learning:
   controller:
     replicas: 2  # Distribute ML processing
+  # Expose metrics port for ML monitoring
+  service:
+    main:
+      ports:
+        metrics:
+          enabled: true
+          port: 8082
+          protocol: TCP
+          targetPort: 8082
   resources:
     requests:
       memory: "2Gi"

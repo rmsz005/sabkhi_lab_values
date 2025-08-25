@@ -133,3 +133,31 @@ additionalServiceMonitors:
     - port: metrics
       path: /metrics
       interval: 30s
+  
+  # Monitor Immich Server
+  - name: immich-server
+    namespaceSelector:
+      matchNames:
+        - immich
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: server
+        app.kubernetes.io/instance: immich
+    endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+  
+  # Monitor Immich Machine Learning
+  - name: immich-machine-learning
+    namespaceSelector:
+      matchNames:
+        - immich
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: machine-learning
+        app.kubernetes.io/instance: immich
+    endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
