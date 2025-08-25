@@ -34,19 +34,14 @@ loki:
 
   # Limits configuration
   limits_config:
-    retention_period: 168h  # 7 days retention
     ingestion_rate_mb: 16
     ingestion_burst_size_mb: 32
     max_query_length: 721h
     max_query_parallelism: 32
 
-  # Compactor configuration for retention
+  # Compactor configuration (retention disabled for now)
   compactor:
     working_directory: /var/loki/retention
-    retention_enabled: true
-    retention_delete_delay: 2h
-    retention_delete_worker_count: 150
-    delete_request_store: filesystem
 
 # Single binary deployment
 singleBinary:

@@ -1,0 +1,153 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Kubernetes Logs",
+    "tags": ["loki", "logs", "kubernetes"],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "hideControls": false,
+    "graphTooltip": 1,
+    "panels": [
+      {
+        "id": 1,
+        "title": "Log Volume",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(rate({job=~\".+\"}[5m])) by (namespace)",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            },
+            "legendFormat": "{{namespace}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "logs/sec"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Top Logging Pods",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "topk(5, sum(rate({job=~\".+\"}[5m])) by (pod))",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Immich Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{namespace=\"immich\"} |= ``",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Error Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=~\".+\"} |~ `(?i)(error|exception|failed|fatal)`",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 18}
+      },
+      {
+        "id": 5,
+        "title": "Warning Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=~\".+\"} |~ `(?i)(warn|warning)`",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 28}
+      },
+      {
+        "id": 6,
+        "title": "ArgoCD Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{namespace=\"argocd\"} |= ``",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "gridPos": {"h": 10, "w": 12, "x": 0, "y": 38}
+      },
+      {
+        "id": 7,
+        "title": "Longhorn Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{namespace=\"longhorn\"} |= ``",
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "loki"
+            }
+          }
+        ],
+        "gridPos": {"h": 10, "w": 12, "x": 12, "y": 38}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "templating": {
+      "list": [
+        {
+          "name": "namespace",
+          "type": "query",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "query": "label_values(namespace)",
+          "multi": true,
+          "includeAll": true,
+          "allValue": ".*"
+        }
+      ]
+    }
+  }
+}

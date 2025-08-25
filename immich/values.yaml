@@ -6,7 +6,7 @@ immich:
       existingClaim: "immich-library-pvc"
 
 image:
-  tag: "v1.139.2"
+  tag: "v1.139.3"
 
 # Use external PostgreSQL (deprecated subchart)
 postgresql:
