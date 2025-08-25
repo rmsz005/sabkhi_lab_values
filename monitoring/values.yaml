@@ -39,20 +39,18 @@ grafana:
     storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
   
   # Additional data sources
-  additionalDataSources:
-    - name: Loki
-      type: loki
-      url: http://loki:3100
-      access: proxy
-      isDefault: false
-      jsonData:
-        maxLines: 1000
-        timeout: 60
-        derivedFields:
-          - datasourceUid: prometheus
-            matcherRegex: "traceID=(\\w+)"
-            name: TraceID
-            url: "$${__value.raw}"
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Loki
+          type: loki
+          url: http://loki:3100
+          access: proxy
+          isDefault: false
+          jsonData:
+            maxLines: 1000
+            timeout: 60
   
   # Ingress configuration
   ingress:
