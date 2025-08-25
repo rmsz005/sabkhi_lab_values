@@ -24,8 +24,8 @@ env:
   NODE_ENV: "production"
   LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
   # Transcoding optimization
-  IMMICH_WORKERS_INCLUDE: "api"
-  IMMICH_WORKERS_EXCLUDE: ""
+  # IMMICH_WORKERS_INCLUDE: "api"  # Removed - let single server handle all tasks
+  # IMMICH_WORKERS_EXCLUDE: ""     # Removed - not using worker splitting
   # Increase transcoding parallelism
   FFMPEG_THREADS: "0"  # Use all available CPU cores
   # Enable Immich monitoring/telemetry
@@ -46,7 +46,7 @@ env:
 
 server:
   controller:
-    replicas: 1  # Immich API server - single replica for API consistency
+    replicas: 1  # Single Immich server handling all tasks
   # Expose metrics port for Prometheus scraping
   service:
     main:
@@ -81,36 +81,17 @@ server:
           secretName: immich-tls
   resources:
     requests:
-      memory: "1Gi"      # Reduced for API-only workload
-      cpu: "500m"
-    limits:
-      memory: "3Gi"      # API doesn't need as much memory
-      cpu: "2000m"
-
-# Dedicated microservices worker for background jobs
-microservices:
-  enabled: true
-  controller:
-    replicas: 2  # Scale workers for parallel job processing
-  env:
-    # Worker-specific configuration
-    IMMICH_WORKERS_EXCLUDE: "api"  # Handle everything except API
-    # Inherit all other env vars from main env section
-  service:
-    main:
-      ports:
-        metrics:
-          enabled: true
-          port: 8082
-          protocol: TCP
-          targetPort: 8082
-  resources:
-    requests:
-      memory: "2Gi"      # More memory for job processing
+      memory: "2Gi"      # Increased for handling all tasks
       cpu: "1000m"
     limits:
-      memory: "6Gi"      # Background jobs need more memory
-      cpu: "4000m"       # More CPU for transcoding and ML tasks
+      memory: "8Gi"      # Full server needs more resources
+      cpu: "6000m"       # Allow CPU bursts for transcoding
+
+# Note: The official Immich chart doesn't support separate microservices deployment
+# We need to either:
+# 1. Use single server (remove IMMICH_WORKERS_INCLUDE) for simplicity
+# 2. Create a custom deployment alongside the chart
+# For now, we'll revert to single server handling all tasks
 
 # Scale machine learning for AI workloads
 machine-learning:
@@ -147,30 +128,7 @@ affinity:
             - immich
         topologyKey: kubernetes.io/hostname
 
-# Separate affinity rules for microservices workers
-microservices:
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/component
-              operator: In
-              values:
-              - microservices
-          topologyKey: kubernetes.io/hostname
-      # Prefer not to run on same node as API server
-      - weight: 50
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/component
-              operator: In
-              values:
-              - server
-          topologyKey: kubernetes.io/hostname
+# Removed microservices-specific affinity rules since we're using single server
 
 redis:
   enabled: true
