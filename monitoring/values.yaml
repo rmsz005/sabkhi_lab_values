@@ -38,6 +38,22 @@ grafana:
     size: 5Gi
     storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
   
+  # Additional data sources
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki:3100
+      access: proxy
+      isDefault: false
+      jsonData:
+        maxLines: 1000
+        timeout: 60
+        derivedFields:
+          - datasourceUid: prometheus
+            matcherRegex: "traceID=(\\w+)"
+            name: TraceID
+            url: "$${__value.raw}"
+  
   # Ingress configuration
   ingress:
     enabled: true
@@ -159,5 +175,33 @@ additionalServiceMonitors:
         app.kubernetes.io/instance: immich
     endpoints:
     - port: metrics
+      path: /metrics
+      interval: 30s
+  
+  # Monitor Loki
+  - name: loki
+    namespaceSelector:
+      matchNames:
+        - monitoring
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: loki
+        app.kubernetes.io/instance: loki
+    endpoints:
+    - port: http-metrics
+      path: /metrics
+      interval: 30s
+  
+  # Monitor Promtail
+  - name: promtail
+    namespaceSelector:
+      matchNames:
+        - monitoring
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: promtail
+        app.kubernetes.io/instance: promtail
+    endpoints:
+    - port: http-metrics
       path: /metrics
       interval: 30s

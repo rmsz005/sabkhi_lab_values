@@ -1,0 +1,114 @@
+---
+# Loki configuration for centralized logging
+deploymentMode: SingleBinary
+
+loki:
+  auth_enabled: false
+  
+  server:
+    http_listen_port: 3100
+    grpc_listen_port: 9095
+    http_server_read_timeout: 310s
+    http_server_write_timeout: 310s
+  
+  # Storage configuration
+  commonConfig:
+    replication_factor: 1
+  
+  storage:
+    type: filesystem
+    filesystem:
+      chunks_directory: /var/loki/chunks
+      rules_directory: /var/loki/rules
+  
+  # Schema configuration
+  schemaConfig:
+    configs:
+      - from: 2024-01-01
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+
+  # Limits configuration
+  limits_config:
+    retention_period: 168h  # 7 days retention
+    ingestion_rate_mb: 16
+    ingestion_burst_size_mb: 32
+    max_query_length: 721h
+    max_query_parallelism: 32
+
+  # Compactor configuration for retention
+  compactor:
+    working_directory: /var/loki/retention
+    retention_enabled: true
+    retention_delete_delay: 2h
+    retention_delete_worker_count: 150
+
+# Single binary deployment
+singleBinary:
+  replicas: 1
+  
+  # Resource allocation
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  
+  # Persistence for logs storage
+  persistence:
+    enabled: true
+    size: 50Gi
+    storageClass: "longhorn-nvme-replicated"  # Fast storage for logs
+  
+  # Expose metrics for Prometheus
+  extraPorts:
+    - name: metrics
+      port: 3100
+      protocol: TCP
+      targetPort: http-metrics
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 3100
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3100"
+    prometheus.io/path: "/metrics"
+
+# Gateway configuration (disabled for single binary)
+gateway:
+  enabled: false
+
+# Backend components (disabled for single binary)
+read:
+  replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+
+# Monitoring
+monitoring:
+  selfMonitoring:
+    enabled: false
+    grafanaAgent:
+      installOperator: false
+  
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+# Test configuration
+test:
+  enabled: false
+
+# Loki Canary (disabled to save resources)
+lokiCanary:
+  enabled: false

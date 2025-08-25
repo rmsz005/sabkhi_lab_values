@@ -1,0 +1,161 @@
+---
+# Promtail configuration for log collection
+config:
+  # Log shipping target
+  clients:
+    - url: http://loki:3100/loki/api/v1/push
+      tenant_id: ""
+
+  scrape_configs:
+    # Kubernetes pod logs
+    - job_name: kubernetes-pods
+      kubernetes_sd_configs:
+        - role: pod
+      pipeline_stages:
+        - cri: {}
+      relabel_configs:
+        # Only scrape pods with logging enabled
+        - source_labels:
+            - __meta_kubernetes_pod_controller_name
+          regex: ([0-9a-z-.]+)
+          target_label: __tmp_controller_name
+        
+        # Add namespace
+        - source_labels:
+            - __meta_kubernetes_pod_namespace
+          target_label: namespace
+        
+        # Add pod name
+        - source_labels:
+            - __meta_kubernetes_pod_name
+          target_label: pod
+        
+        # Add container name
+        - source_labels:
+            - __meta_kubernetes_pod_container_name
+          target_label: container
+        
+        # Add app label if available
+        - source_labels:
+            - __meta_kubernetes_pod_label_app_kubernetes_io_name
+          target_label: app
+        
+        # Add instance label if available
+        - source_labels:
+            - __meta_kubernetes_pod_label_app_kubernetes_io_instance
+          target_label: instance
+        
+        # Drop logs from monitoring namespace to avoid noise (optional)
+        - source_labels:
+            - __meta_kubernetes_pod_namespace
+          regex: kube-system
+          action: drop
+        
+        # Include specific namespaces of interest
+        - source_labels:
+            - __meta_kubernetes_pod_namespace
+          regex: (immich|argocd|longhorn|metallb-system|cert-manager|n8n|default|monitoring)
+          action: keep
+        
+        # Set path to log file
+        - source_labels:
+            - __meta_kubernetes_pod_uid
+            - __meta_kubernetes_pod_container_name
+          target_label: __path__
+          separator: /
+          replacement: /var/log/pods/*$1/*.log
+
+    # Kubernetes events
+    - job_name: kubernetes-events
+      kubernetes_sd_configs:
+        - role: node
+      static_configs:
+        - targets:
+            - localhost
+          labels:
+            job: kubernetes-events
+            __path__: /var/log/events.log
+
+# DaemonSet configuration
+daemonset:
+  enabled: true
+
+# Resource allocation  
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+# Mount additional paths for log collection
+extraVolumes:
+  - name: varlog
+    hostPath:
+      path: /var/log
+  - name: varlibdockercontainers
+    hostPath:
+      path: /var/lib/docker/containers
+
+extraVolumeMounts:
+  - name: varlog
+    mountPath: /var/log
+    readOnly: true
+  - name: varlibdockercontainers
+    mountPath: /var/lib/docker/containers
+    readOnly: true
+
+# Service account permissions
+serviceAccount:
+  create: true
+
+# RBAC permissions for reading pod logs
+rbac:
+  create: true
+  pspEnabled: false
+
+# Node selection and tolerations
+nodeSelector: {}
+tolerations:
+  - effect: NoSchedule
+    operator: Exists
+  - effect: NoExecute
+    operator: Exists
+
+# Priority class for log collection
+priorityClassName: ""
+
+# Security context
+securityContext:
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 0  # Required to read log files
+
+# Service monitor for Prometheus
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  additionalLabels: {}
+
+# Additional configuration
+defaultVolumes:
+  - name: run
+    hostPath:
+      path: /run/promtail
+  - name: containers
+    hostPath:
+      path: /var/lib/docker/containers
+  - name: pods
+    hostPath:
+      path: /var/log/pods
+
+defaultVolumeMounts:
+  - name: run
+    mountPath: /run/promtail
+  - name: containers
+    mountPath: /var/lib/docker/containers
+    readOnly: true
+  - name: pods
+    mountPath: /var/log/pods
+    readOnly: true
