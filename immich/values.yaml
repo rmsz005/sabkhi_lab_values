@@ -46,7 +46,7 @@ env:
 
 server:
   controller:
-    replicas: 2  # Single Immich server handling all tasks
+    replicas: 3  # Single Immich server handling all tasks
   # Expose metrics port for Prometheus scraping
   service:
     main:
