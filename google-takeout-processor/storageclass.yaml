@@ -10,9 +10,10 @@ metadata:
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
 reclaimPolicy: Delete  # Can be deleted when not needed
-volumeBindingMode: WaitForFirstConsumer
+volumeBindingMode: Immediate  # Pre-allocate storage
 parameters:
   numberOfReplicas: "1"  # Single replica for cost efficiency
   staleReplicaTimeout: "2880"  # 48 hours
   diskSelector: "hd"
   dataLocality: "best-effort"
+  nodeSelector: "node-role.kubernetes.io/control-plane!=true"  # Avoid control plane nodes
