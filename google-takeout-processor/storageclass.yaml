@@ -16,4 +16,3 @@ parameters:
   staleReplicaTimeout: "2880"  # 48 hours
   diskSelector: "hd"
   dataLocality: "best-effort"
-  nodeSelector: "node-role.kubernetes.io/control-plane!=true"  # Avoid control plane nodes
