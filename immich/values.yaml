@@ -148,6 +148,6 @@ redis:
         cpu: 100m
       limits:
         memory: 512Mi
-        cpu: 500m
+        cpu: 1500m
 
 # PVC is created by immich-storage ArgoCD application
