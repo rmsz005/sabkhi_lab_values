@@ -96,7 +96,7 @@ server:
 # Scale machine learning for AI workloads
 machine-learning:
   controller:
-    replicas: 3  # Distribute ML processing
+    replicas: 4  # Distribute ML processing
   # Expose metrics port for ML monitoring
   service:
     main:
@@ -111,8 +111,8 @@ machine-learning:
       memory: "2Gi"
       cpu: "1000m"
     limits:
-      memory: "6Gi" 
-      cpu: "3000m"
+      memory: "8Gi" 
+      cpu: "6000m"
   
 # Pod anti-affinity to spread different Immich components across nodes
 affinity:
