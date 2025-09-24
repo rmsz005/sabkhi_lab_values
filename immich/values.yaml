@@ -46,7 +46,7 @@ env:
 
 server:
   controller:
-    replicas: 3  # Single Immich server handling all tasks
+    replicas: 1  # Temporarily reduced due to RWX mount issues
   # Expose metrics port for Prometheus scraping
   service:
     main:
