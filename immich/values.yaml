@@ -96,7 +96,7 @@ server:
 # Scale machine learning for AI workloads
 machine-learning:
   controller:
-    replicas: 4  # Distribute ML processing
+    replicas: 3  # Distribute ML processing
   # Expose metrics port for ML monitoring
   service:
     main:
