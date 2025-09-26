@@ -58,10 +58,10 @@ spec:
         resources:
           requests:
             memory: "2Gi"
-            cpu: "1000m"
+            cpu: "5000m"
           limits:
             memory: "8Gi"
-            cpu: "4000m"
+            cpu: "7000m"
         volumeMounts:
         - name: workspace-storage
           mountPath: /workspace
