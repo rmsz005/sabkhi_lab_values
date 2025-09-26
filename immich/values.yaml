@@ -85,7 +85,7 @@ server:
       cpu: "1000m"
     limits:
       memory: "8Gi"      # Full server needs more resources
-      cpu: "6000m"       # Allow CPU bursts for transcoding
+      cpu: "4000m"       # Allow CPU bursts for transcoding
 
 # Note: The official Immich chart doesn't support separate microservices deployment
 # We need to either:
@@ -112,7 +112,7 @@ machine-learning:
       cpu: "1000m"
     limits:
       memory: "8Gi" 
-      cpu: "6000m"
+      cpu: "4000m"
   
 # Pod anti-affinity to spread different Immich components across nodes
 affinity:
@@ -148,6 +148,6 @@ redis:
         cpu: 100m
       limits:
         memory: 512Mi
-        cpu: 1500m
+        cpu: 1000m
 
 # PVC is created by immich-storage ArgoCD application
