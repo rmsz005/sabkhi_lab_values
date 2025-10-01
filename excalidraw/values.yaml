@@ -5,7 +5,7 @@
 image:
   repository: excalidraw/excalidraw
   pullPolicy: IfNotPresent
-  tag: "v0.15.0"
+  tag: "latest"
 
 # Replica count
 replicaCount: 2
