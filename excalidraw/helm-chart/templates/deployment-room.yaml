@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "excalidraw.fullname" . }}-room
+  labels:
+    {{- include "excalidraw.labels" . | nindent 4 }}
+    app.kubernetes.io/component: room
+spec:
+  replicas: {{ .Values.excalidrawRoom.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "excalidraw.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: room
+  template:
+    metadata:
+      labels:
+        {{- include "excalidraw.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: room
+    spec:
+      containers:
+      - name: excalidraw-room
+        image: "{{ .Values.excalidrawRoom.image.repository }}:{{ .Values.excalidrawRoom.image.tag }}"
+        imagePullPolicy: {{ .Values.excalidrawRoom.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.excalidrawRoom.resources | nindent 10 }}
+

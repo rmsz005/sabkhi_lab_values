@@ -1,0 +1,158 @@
+# Default values for excalidraw-complete
+
+# Global settings
+replicaCount: 2
+
+# Excalidraw Frontend Configuration
+excalidraw:
+  image:
+    repository: excalidraw/excalidraw
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  
+  # Environment variables for the frontend
+  env:
+    # Replace with your domain
+    domain: "excalidraw.internal.rmsz005.com"
+    
+    # Storage backend configuration
+    storageBackend: "http"
+    httpStorageBackendUrl: "https://excalidraw.internal.rmsz005.com/api/v2"
+    backendV2GetUrl: "https://excalidraw.internal.rmsz005.com/api/v2/scenes/"
+    backendV2PostUrl: "https://excalidraw.internal.rmsz005.com/api/v2/scenes/"
+    
+    # WebSocket server for collaboration
+    wsServerUrl: "https://excalidraw.internal.rmsz005.com"
+    
+    # Library configuration
+    libraryUrl: "https://libraries.excalidraw.com"
+    libraryBackend: "https://us-central1-excalidraw-room-persistence.cloudfunctions.net/libraries"
+    
+    # Portal and Plus URLs
+    portalUrl: "https://portal.excalidraw.com"
+    plusApp: "https://app.excalidraw.com"
+    plusLp: "https://plus.excalidraw.com"
+    
+    # Firebase config (for official excalidraw features)
+    firebaseConfig: '{"apiKey":"AIzaSyAd15pYlMci_xIp9ko6wkEsDzAAA0Dn0RU","authDomain":"excalidraw-room-persistence.firebaseapp.com","databaseURL":"https://excalidraw-room-persistence.firebaseio.com","projectId":"excalidraw-room-persistence","storageBucket":"excalidraw-room-persistence.appspot.com","messagingSenderId":"654800341332","appId":"1:654800341332:web:4a692de832b55bd57ce0c1"}'
+    
+    # Feature flags
+    disableTracking: ""
+    collapseOverlay: "true"
+    enableEslint: "true"
+
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Excalidraw Room (Collaboration Server)
+excalidrawRoom:
+  image:
+    repository: excalidraw/excalidraw-room
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  
+  replicaCount: 2
+  
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Excalidraw Backend (Storage Server)
+excalidrawBackend:
+  image:
+    repository: kiliandeca/excalidraw-storage-backend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  
+  replicaCount: 2
+  
+  port: 3000
+  
+  # Database connection (will use internal PostgreSQL by default)
+  database:
+    # Format: postgres://user:password@host:port/database
+    # This will be auto-generated if using the included PostgreSQL
+    uri: ""
+  
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Nginx Reverse Proxy
+nginx:
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    tag: "1.25-alpine"
+  
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    cert-manager.io/common-name: "excalidraw.internal.rmsz005.com"
+  hosts:
+    - host: excalidraw.internal.rmsz005.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - excalidraw.internal.rmsz005.com
+      secretName: excalidraw-tls
+
+# PostgreSQL configuration (using Bitnami chart)
+postgresql:
+  enabled: true
+  auth:
+    username: excalidraw
+    password: excalidraw
+    database: excalidraw
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+# External PostgreSQL (if postgresql.enabled is false)
+externalDatabase:
+  host: ""
+  port: 5432
+  user: excalidraw
+  password: excalidraw
+  database: excalidraw
+

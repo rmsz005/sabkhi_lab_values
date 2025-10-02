@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "excalidraw.fullname" . }}-backend
+  labels:
+    {{- include "excalidraw.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.excalidrawBackend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "excalidraw.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        {{- include "excalidraw.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      containers:
+      - name: excalidraw-backend
+        image: "{{ .Values.excalidrawBackend.image.repository }}:{{ .Values.excalidrawBackend.image.tag }}"
+        imagePullPolicy: {{ .Values.excalidrawBackend.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.excalidrawBackend.port }}
+          protocol: TCP
+        env:
+        - name: PORT
+          value: {{ .Values.excalidrawBackend.port | quote }}
+        - name: STORAGE_URI
+          value: {{ include "excalidraw.databaseUri" . | quote }}
+        resources:
+          {{- toYaml .Values.excalidrawBackend.resources | nindent 10 }}
+
