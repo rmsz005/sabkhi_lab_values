@@ -1,0 +1,18 @@
+apiVersion: v2
+name: spotizerr
+description: A Helm chart for Spotizerr - Spotify download automation
+type: application
+version: 1.0.0
+appVersion: "latest"
+keywords:
+  - spotizerr
+  - spotify
+  - automation
+home: https://spotizerr.rtfd.io
+sources:
+  - https://github.com/yourusername/spotizerr-helm-chart
+maintainers:
+  - name: Community
+    email: maintainer@example.com
+icon: https://raw.githubusercontent.com/yourusername/spotizerr-helm-chart/main/icon.png
+

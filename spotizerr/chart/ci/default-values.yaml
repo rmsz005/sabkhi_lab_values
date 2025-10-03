@@ -1,0 +1,40 @@
+# CI/CD test values
+# These values are used for automated testing
+
+spotizerr:
+  image:
+    pullPolicy: IfNotPresent
+  
+  persistence:
+    enabled: true
+    data:
+      size: 100Mi
+    downloads:
+      size: 100Mi
+    logs:
+      size: 100Mi
+    cache:
+      size: 100Mi
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+redis:
+  enabled: true
+  password: "test-password"
+  persistence:
+    enabled: true
+    size: 100Mi
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+

@@ -1,0 +1,76 @@
+{{- if and .Values.spotizerr.persistence.data.enabled (not .Values.spotizerr.persistence.data.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "spotizerr.fullname" . }}-data
+  labels:
+    {{- include "spotizerr.labels" . | nindent 4 }}
+    app.kubernetes.io/component: data
+spec:
+  accessModes:
+  - {{ .Values.spotizerr.persistence.data.accessMode }}
+  {{- if .Values.spotizerr.persistence.storageClassName }}
+  storageClassName: {{ .Values.spotizerr.persistence.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.spotizerr.persistence.data.size }}
+---
+{{- end }}
+{{- if and .Values.spotizerr.persistence.downloads.enabled (not .Values.spotizerr.persistence.downloads.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "spotizerr.fullname" . }}-downloads
+  labels:
+    {{- include "spotizerr.labels" . | nindent 4 }}
+    app.kubernetes.io/component: downloads
+spec:
+  accessModes:
+  - {{ .Values.spotizerr.persistence.downloads.accessMode }}
+  {{- if .Values.spotizerr.persistence.storageClassName }}
+  storageClassName: {{ .Values.spotizerr.persistence.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.spotizerr.persistence.downloads.size }}
+---
+{{- end }}
+{{- if and .Values.spotizerr.persistence.logs.enabled (not .Values.spotizerr.persistence.logs.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "spotizerr.fullname" . }}-logs
+  labels:
+    {{- include "spotizerr.labels" . | nindent 4 }}
+    app.kubernetes.io/component: logs
+spec:
+  accessModes:
+  - {{ .Values.spotizerr.persistence.logs.accessMode }}
+  {{- if .Values.spotizerr.persistence.storageClassName }}
+  storageClassName: {{ .Values.spotizerr.persistence.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.spotizerr.persistence.logs.size }}
+---
+{{- end }}
+{{- if and .Values.spotizerr.persistence.cache.enabled (not .Values.spotizerr.persistence.cache.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "spotizerr.fullname" . }}-cache
+  labels:
+    {{- include "spotizerr.labels" . | nindent 4 }}
+    app.kubernetes.io/component: cache
+spec:
+  accessModes:
+  - {{ .Values.spotizerr.persistence.cache.accessMode }}
+  {{- if .Values.spotizerr.persistence.storageClassName }}
+  storageClassName: {{ .Values.spotizerr.persistence.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.spotizerr.persistence.cache.size }}
+{{- end }}
+

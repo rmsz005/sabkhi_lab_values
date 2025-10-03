@@ -1,0 +1,110 @@
+# Example: Using Existing PersistentVolumeClaims
+#
+# This example shows how to use pre-existing PVCs with the Spotizerr Helm chart.
+# This is useful for:
+# - Migrating from docker-compose to Kubernetes
+# - Preserving data across chart reinstalls
+# - Using PVCs created by external storage provisioners
+# - Sharing volumes between releases (advanced)
+
+spotizerr:
+  # Your application secrets
+  secrets:
+    SPOTIFY_CLIENT_ID: "your-client-id"
+    SPOTIFY_CLIENT_SECRET: "your-client-secret"
+  
+  # Persistence configuration with existing PVCs
+  persistence:
+    # Data volume - contains config, credentials, watch lists, history
+    data:
+      enabled: true
+      existingClaim: "spotizerr-data-pvc"  # Name of your existing PVC
+    
+    # Downloads volume - contains downloaded files
+    downloads:
+      enabled: true
+      existingClaim: "spotizerr-downloads-pvc"  # Name of your existing PVC
+    
+    # Logs volume - contains application logs
+    logs:
+      enabled: true
+      existingClaim: "spotizerr-logs-pvc"  # Name of your existing PVC
+    
+    # Cache volume - contains cache files
+    cache:
+      enabled: true
+      existingClaim: "spotizerr-cache-pvc"  # Name of your existing PVC
+
+# Redis configuration with existing PVC
+redis:
+  enabled: true
+  password: "your-secure-redis-password"
+  
+  persistence:
+    enabled: true
+    existingClaim: "redis-data-pvc"  # Name of your existing PVC
+
+---
+# Example: Mixed approach - some new PVCs, some existing
+#
+# You can also mix and match. For example, use an existing PVC for downloads
+# (large volume) but let the chart create new PVCs for smaller volumes.
+
+spotizerr:
+  secrets:
+    SPOTIFY_CLIENT_ID: "your-client-id"
+    SPOTIFY_CLIENT_SECRET: "your-client-secret"
+  
+  persistence:
+    # Let the chart create this PVC (new)
+    data:
+      enabled: true
+      size: 1Gi
+      # existingClaim: ""  # Empty or omit to create new PVC
+    
+    # Use existing PVC for downloads (large volume you want to preserve)
+    downloads:
+      enabled: true
+      existingClaim: "my-large-downloads-volume"
+    
+    # Let the chart create these PVCs (new)
+    logs:
+      enabled: true
+      size: 1Gi
+    
+    cache:
+      enabled: true
+      size: 100Mi
+
+redis:
+  enabled: true
+  password: "your-password"
+  # Let the chart create Redis PVC
+  persistence:
+    enabled: true
+    size: 1Gi
+
+---
+# Before using existing PVCs, ensure they exist in your cluster:
+#
+# kubectl get pvc -n your-namespace
+#
+# If you need to create PVCs manually:
+#
+# kubectl apply -f - <<EOF
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: spotizerr-data-pvc
+#   namespace: spotizerr
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+#   storageClassName: standard  # Use your storage class
+# EOF
+#
+# Repeat for each volume: downloads, logs, cache, redis-data
+

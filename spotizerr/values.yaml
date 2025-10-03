@@ -1,0 +1,206 @@
+---
+# Spotizerr Helm Chart Values for sabkhi_lab
+# Configuration based on docker-compose setup
+
+spotizerr:
+  image:
+    repository: cooldockerizer93/spotizerr
+    tag: "latest"
+    pullPolicy: Always  # Use Always to get latest updates
+  
+  # Security context matching docker-compose user:group 1000:1000
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  
+  # Resource configuration
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 7171
+    targetPort: 7171
+  
+  # Persistent storage - using existing PVCs that will be created separately
+  persistence:
+    enabled: true
+    storageClassName: "longhorn-ssd-replicated"
+    
+    # Data volume (config, creds, watch, history)
+    data:
+      enabled: true
+      size: 1Gi
+      existingClaim: ""  # Will be created by the chart
+    
+    # Downloads volume
+    downloads:
+      enabled: true
+      size: 50Gi  # Adjust based on your music library size
+      existingClaim: ""
+    
+    # Logs volume
+    logs:
+      enabled: true
+      size: 2Gi
+      existingClaim: ""
+    
+    # Cache volume
+    cache:
+      enabled: true
+      size: 500Mi
+      existingClaim: ""
+  
+  # Environment variables from .env file
+  env:
+    HOST: "0.0.0.0"
+    PORT: "7171"
+    LOG_LEVEL: "INFO"
+    EXPLICIT_FILTER: "false"
+    START_EMBEDDED_WORKERS: "true"
+    REDIS_DB: "0"
+    UMASK: "0022"
+    SKIP_SET_PERMISSIONS: "false"
+    # Authentication settings
+    ENABLE_AUTH: "false"  # Set to true if you want multi-user mode
+    JWT_EXPIRATION_HOURS: "720"
+    DEFAULT_ADMIN_USERNAME: "admin"
+    DISABLE_REGISTRATION: "false"
+    # SSO settings (disabled by default)
+    SSO_ENABLED: "false"
+    # Frontend URL for SSO
+    # FRONTEND_URL: "https://spotizerr.internal.rmsz005.com"
+    # SSO_BASE_REDIRECT_URI: "https://spotizerr.internal.rmsz005.com/api/auth/sso/callback"
+  
+  # Note: REDIS_HOST, REDIS_PORT, and REDIS_PASSWORD are automatically
+  # injected by the chart template when redis.enabled=true
+  # See chart/templates/deployment.yaml lines 48-57
+  
+  # Secrets - additional app secrets via SealedSecrets (if needed)
+  secrets: {}
+    # JWT_SECRET: ""  # Set via sealed-secret if ENABLE_AUTH=true
+    # DEFAULT_ADMIN_PASSWORD: ""  # Set via sealed-secret if ENABLE_AUTH=true
+    # GOOGLE_CLIENT_ID: ""  # Set via sealed-secret if SSO_ENABLED=true
+    # GOOGLE_CLIENT_SECRET: ""
+    # GITHUB_CLIENT_ID: ""
+    # GITHUB_CLIENT_SECRET: ""
+  
+  # Health checks
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 7171
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /
+      port: 7171
+    initialDelaySeconds: 30
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# Redis configuration (embedded)
+redis:
+  enabled: true
+  
+  image:
+    repository: redis
+    tag: "alpine"
+    pullPolicy: IfNotPresent
+  
+  # Redis password via sealed secret
+  existingSecret: "spotizerr-redis-secret"
+  existingSecretPasswordKey: "redis-password"
+  # password: "changeme"  # Only used if existingSecret is not set
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  service:
+    type: ClusterIP
+    port: 6379
+  
+  persistence:
+    enabled: true
+    storageClassName: "longhorn-ssd-replicated"
+    size: 2Gi
+    existingClaim: ""
+  
+  args:
+    appendonly: true
+
+# Ingress configuration for external access
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    cert-manager.io/common-name: "spotizerr.internal.rmsz005.com"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"  # Allow large file uploads
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  hosts:
+    - host: spotizerr.internal.rmsz005.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: spotizerr-tls
+      hosts:
+        - spotizerr.internal.rmsz005.com
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations (for Prometheus if needed)
+podAnnotations: {}
+  # prometheus.io/scrape: "true"
+  # prometheus.io/port: "7171"
+  # prometheus.io/path: "/metrics"
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+
+# Node selector - adjust if you have specific node labels
+nodeSelector: {}
+  # kubernetes.io/hostname: specific-node
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Number of replicas (keep at 1 for stateful applications)
+replicaCount: 1
+
+# Image pull secrets
+imagePullSecrets: []
+
+# Additional labels
+commonLabels:
+  app: spotizerr
+

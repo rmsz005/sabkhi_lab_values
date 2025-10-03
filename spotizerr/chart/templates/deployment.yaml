@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "spotizerr.fullname" . }}
+  labels:
+    {{- include "spotizerr.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "spotizerr.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "spotizerr.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "spotizerr.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: spotizerr
+        image: "{{ .Values.spotizerr.image.repository }}:{{ .Values.spotizerr.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.spotizerr.image.pullPolicy }}
+        securityContext:
+          {{- toYaml .Values.spotizerr.securityContext | nindent 10 }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.spotizerr.service.targetPort }}
+          protocol: TCP
+        {{- if .Values.spotizerr.livenessProbe.enabled }}
+        livenessProbe:
+          {{- toYaml (omit .Values.spotizerr.livenessProbe "enabled") | nindent 10 }}
+        {{- end }}
+        {{- if .Values.spotizerr.readinessProbe.enabled }}
+        readinessProbe:
+          {{- toYaml (omit .Values.spotizerr.readinessProbe "enabled") | nindent 10 }}
+        {{- end }}
+        env:
+        {{- if .Values.redis.enabled }}
+        - name: REDIS_HOST
+          value: {{ include "spotizerr.redis.fullname" . }}
+        - name: REDIS_PORT
+          value: "{{ .Values.redis.service.port }}"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "spotizerr.redis.secretName" . }}
+              key: {{ .Values.redis.existingSecretPasswordKey }}
+        {{- end }}
+        {{- range $key, $value := .Values.spotizerr.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- if .Values.spotizerr.secrets }}
+        envFrom:
+        - secretRef:
+            name: {{ include "spotizerr.secretName" . }}
+        {{- end }}
+        volumeMounts:
+        {{- if .Values.spotizerr.persistence.data.enabled }}
+        - name: data
+          mountPath: /app/data
+        {{- end }}
+        {{- if .Values.spotizerr.persistence.downloads.enabled }}
+        - name: downloads
+          mountPath: /app/downloads
+        {{- end }}
+        {{- if .Values.spotizerr.persistence.logs.enabled }}
+        - name: logs
+          mountPath: /app/logs
+        {{- end }}
+        {{- if .Values.spotizerr.persistence.cache.enabled }}
+        - name: cache
+          mountPath: /app/.cache
+        {{- end }}
+        resources:
+          {{- toYaml .Values.spotizerr.resources | nindent 10 }}
+      volumes:
+      {{- if .Values.spotizerr.persistence.data.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Values.spotizerr.persistence.data.existingClaim | default (printf "%s-data" (include "spotizerr.fullname" .)) }}
+      {{- end }}
+      {{- if .Values.spotizerr.persistence.downloads.enabled }}
+      - name: downloads
+        persistentVolumeClaim:
+          claimName: {{ .Values.spotizerr.persistence.downloads.existingClaim | default (printf "%s-downloads" (include "spotizerr.fullname" .)) }}
+      {{- end }}
+      {{- if .Values.spotizerr.persistence.logs.enabled }}
+      - name: logs
+        persistentVolumeClaim:
+          claimName: {{ .Values.spotizerr.persistence.logs.existingClaim | default (printf "%s-logs" (include "spotizerr.fullname" .)) }}
+      {{- end }}
+      {{- if .Values.spotizerr.persistence.cache.enabled }}
+      - name: cache
+        persistentVolumeClaim:
+          claimName: {{ .Values.spotizerr.persistence.cache.existingClaim | default (printf "%s-cache" (include "spotizerr.fullname" .)) }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
