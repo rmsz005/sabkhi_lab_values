@@ -160,6 +160,12 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-body-size: "0"  # Allow large file uploads
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    # SSE (Server-Sent Events) support for real-time download status updates
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"  # Disable buffering for SSE
+    nginx.ingress.kubernetes.io/proxy-cache-control: "no-cache"  # Prevent caching SSE streams
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Connection '';
+      chunked_transfer_encoding off;
   hosts:
     - host: spotizerr.internal.rmsz005.com
       paths:
