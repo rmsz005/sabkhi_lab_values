@@ -165,6 +165,8 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-cache-control: "no-cache"  # Prevent caching SSE streams
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header Connection '';
+      proxy_set_header X-Accel-Buffering no;
+      proxy_http_version 1.1;
       chunked_transfer_encoding off;
   hosts:
     - host: spotizerr.internal.rmsz005.com
