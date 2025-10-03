@@ -13,7 +13,9 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if not .Values.redis.existingSecret }}
         checksum/secret: {{ include (print $.Template.BasePath "/redis-secret.yaml") . | sha256sum }}
+        {{- end }}
       labels:
         {{- include "spotizerr.redis.selectorLabels" . | nindent 8 }}
     spec:
