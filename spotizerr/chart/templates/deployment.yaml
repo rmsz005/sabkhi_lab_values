@@ -82,7 +82,7 @@ spec:
         {{- end }}
         {{- if .Values.spotizerr.persistence.cache.enabled }}
         - name: cache
-          mountPath: /app/.cache
+          mountPath: /app/cache-volume
         {{- end }}
         resources:
           {{- toYaml .Values.spotizerr.resources | nindent 10 }}

@@ -53,6 +53,8 @@ spotizerr:
       existingClaim: ""
     
     # Cache volume
+    # Note: Mounted to /app/cache-volume instead of /app/.cache
+    # because .cache is a file in the image, not a directory
     cache:
       enabled: true
       size: 500Mi
