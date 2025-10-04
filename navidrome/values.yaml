@@ -99,9 +99,9 @@ persistence:
     enabled: true
     type: pvc
     mountPath: /music
-    storageClass: longhorn-ssd-replicated
+    storageClass: longhorn-nvme-replicated
     accessMode: ReadWriteOnce
-    size: 100Gi
+    size: 20Gi
     retain: true
 
 # Resource limits
