@@ -1,0 +1,116 @@
+---
+# Navidrome Helm Chart Values for sabkhi_lab
+# Based on djjudas21/navidrome chart
+
+# Image configuration
+image:
+  repository: deluan/navidrome
+  tag: "0.53.3"
+  pullPolicy: IfNotPresent
+
+# Persistence for music library and data
+persistence:
+  music:
+    enabled: true
+    storageClass: "longhorn-ssd-replicated"
+    size: 100Gi  # Adjust based on your music library size
+    # existingClaim: ""  # Optional: use existing PVC
+  data:
+    enabled: true
+    storageClass: "longhorn-ssd-replicated"
+    size: 5Gi
+    # existingClaim: ""  # Optional: use existing PVC
+
+# Resource limits
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+
+# Environment variables for Navidrome configuration
+env:
+  ND_LOGLEVEL: "info"
+  ND_SESSIONTIMEOUT: "24h"
+  ND_BASEURL: ""  # Set if running behind a reverse proxy
+  # Scanner settings
+  ND_SCANSCHEDULE: "@every 1h"  # Scan for changes every hour
+  ND_AUTOIMPORTPLAYLISTS: "true"
+  # Transcoding settings
+  ND_ENABLETRANSCODINGCONFIG: "true"
+  ND_TRANSCODINGCACHESIZE: "100MB"
+  # UI settings
+  ND_UILOGINBACKGROUNDURL: ""
+  ND_UIWELCOMEMESSAGE: ""
+  ND_ENABLEGRAVATAR: "true"
+  # Last.fm scrobbling support
+  ND_LASTFM_ENABLED: "true"
+  # Spotify integration
+  ND_SPOTIFY_ID: ""  # Set via sealed secret if needed
+  ND_SPOTIFY_SECRET: ""  # Set via sealed secret if needed
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 4533
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    cert-manager.io/common-name: "navidrome.internal.rmsz005.com"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  hosts:
+    - host: navidrome.internal.rmsz005.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: navidrome-tls
+      hosts:
+        - navidrome.internal.rmsz005.com
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations: {}
+
+# Security context
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Number of replicas
+replicaCount: 1
+
+# Image pull secrets
+imagePullSecrets: []
+
+# Additional labels
+commonLabels:
+  app: navidrome
