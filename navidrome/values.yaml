@@ -1,25 +1,108 @@
 ---
 # Navidrome Helm Chart Values for sabkhi_lab
-# Based on djjudas21/navidrome chart
+# Chart: djjudas21/navidrome v6.7.5 (uses bjw-s common library)
+# Navidrome App Version: 0.58.0
 
 # Image configuration
 image:
   repository: deluan/navidrome
-  tag: "0.53.3"
+  tag: "0.58.0"
   pullPolicy: IfNotPresent
 
-# Persistence for music library and data
+# Environment variables for Navidrome configuration
+# See: https://www.navidrome.org/docs/usage/configuration-options/#environment-variables
+env:
+  # Timezone
+  TZ: UTC
+  
+  # Logging and session
+  ND_LOGLEVEL: info
+  ND_SESSIONTIMEOUT: 24h
+  
+  # Music folder (mounted at /music via persistence)
+  ND_MUSICFOLDER: /music
+  
+  # Scanner settings
+  ND_SCANSCHEDULE: "@every 1h"
+  ND_AUTOIMPORTPLAYLISTS: "true"
+  
+  # Transcoding settings
+  ND_ENABLETRANSCODINGCONFIG: "true"
+  ND_TRANSCODINGCACHESIZE: "100MB"
+  
+  # UI settings
+  ND_ENABLEGRAVATAR: "true"
+  ND_UILOGINBACKGROUNDURL: ""
+  ND_UIWELCOMEMESSAGE: ""
+  
+  # Features
+  ND_LASTFM_ENABLED: "true"
+  ND_ENABLESHARING: "false"
+  
+  # Prometheus metrics (disabled by default)
+  ND_PROMETHEUS_ENABLED: "false"
+  
+  # Spotify integration (set via sealed secret if needed)
+  # ND_SPOTIFY_ID: ""
+  # ND_SPOTIFY_SECRET: ""
+
+# Service configuration
+service:
+  main:
+    ports:
+      http:
+        port: 4533
+    monitor:
+      enabled: false
+      endpoints:
+        - port: http
+          scheme: http
+          path: /metrics
+          interval: 1m
+          scrapeTimeout: 10s
+
+# Ingress configuration
+ingress:
+  main:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt"
+      cert-manager.io/common-name: "navidrome.internal.rmsz005.com"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    hosts:
+      - host: navidrome.internal.rmsz005.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: navidrome-tls
+        hosts:
+          - navidrome.internal.rmsz005.com
+
+# Persistence configuration
 persistence:
+  # Config/data volume (database, cache, etc.)
+  config:
+    enabled: true
+    type: pvc
+    mountPath: /data
+    storageClass: longhorn-ssd-replicated
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    retain: true
+  
+  # Music library volume
   music:
     enabled: true
-    storageClass: "longhorn-ssd-replicated"
-    size: 100Gi  # Adjust based on your music library size
-    # existingClaim: ""  # Optional: use existing PVC
-  data:
-    enabled: true
-    storageClass: "longhorn-ssd-replicated"
-    size: 5Gi
-    # existingClaim: ""  # Optional: use existing PVC
+    type: pvc
+    mountPath: /music
+    storageClass: longhorn-ssd-replicated
+    accessMode: ReadWriteOnce
+    size: 100Gi
+    retain: true
 
 # Resource limits
 resources:
@@ -30,71 +113,45 @@ resources:
     memory: "1Gi"
     cpu: "1000m"
 
-# Environment variables for Navidrome configuration
-env:
-  ND_LOGLEVEL: "info"
-  ND_SESSIONTIMEOUT: "24h"
-  ND_BASEURL: ""  # Set if running behind a reverse proxy
-  # Scanner settings
-  ND_SCANSCHEDULE: "@every 1h"  # Scan for changes every hour
-  ND_AUTOIMPORTPLAYLISTS: "true"
-  # Transcoding settings
-  ND_ENABLETRANSCODINGCONFIG: "true"
-  ND_TRANSCODINGCACHESIZE: "100MB"
-  # UI settings
-  ND_UILOGINBACKGROUNDURL: ""
-  ND_UIWELCOMEMESSAGE: ""
-  ND_ENABLEGRAVATAR: "true"
-  # Last.fm scrobbling support
-  ND_LASTFM_ENABLED: "true"
-  # Spotify integration
-  ND_SPOTIFY_ID: ""  # Set via sealed secret if needed
-  ND_SPOTIFY_SECRET: ""  # Set via sealed secret if needed
-
-# Service configuration
-service:
-  type: ClusterIP
-  port: 4533
-  annotations: {}
-
-# Ingress configuration
-ingress:
-  enabled: true
-  className: "nginx"
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt"
-    cert-manager.io/common-name: "navidrome.internal.rmsz005.com"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-  hosts:
-    - host: navidrome.internal.rmsz005.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: navidrome-tls
-      hosts:
-        - navidrome.internal.rmsz005.com
-
-# Service Account
-serviceAccount:
-  create: true
-  annotations: {}
-  name: ""
-
-# Pod annotations
-podAnnotations: {}
-
 # Security context
-securityContext:
+podSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
 
-# Pod security context
-podSecurityContext:
-  fsGroup: 1000
+# Probes (using bjw-s common chart format)
+probes:
+  liveness:
+    enabled: true
+    custom: true
+    spec:
+      httpGet:
+        path: /
+        port: 4533
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+  
+  readiness:
+    enabled: true
+    custom: true
+    spec:
+      httpGet:
+        path: /
+        port: 4533
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+# Controller settings
+controller:
+  replicas: 1
+  strategy: Recreate  # Only one replica can access PVC at a time
+
+# Additional pod annotations
+podAnnotations: {}
 
 # Node selector
 nodeSelector: {}
@@ -104,13 +161,3 @@ tolerations: []
 
 # Affinity rules
 affinity: {}
-
-# Number of replicas
-replicaCount: 1
-
-# Image pull secrets
-imagePullSecrets: []
-
-# Additional labels
-commonLabels:
-  app: navidrome
