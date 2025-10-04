@@ -72,6 +72,8 @@ ingress:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      # Override the default configuration-snippet to empty
+      nginx.ingress.kubernetes.io/configuration-snippet: ""
     hosts:
       - host: navidrome.internal.rmsz005.com
         paths:
