@@ -1,0 +1,23 @@
+---
+# Shared Music Library PVC for Spotizerr (writer) and Navidrome (reader)
+# Both applications will be deployed to the 'media' namespace to share this PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: music-library
+  namespace: media
+  labels:
+    app.kubernetes.io/name: music-library
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/managed-by: argocd
+  annotations:
+    # Prevent accidental deletion
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes:
+    - ReadWriteMany  # RWX allows both Spotizerr and Navidrome to mount simultaneously
+  storageClassName: longhorn-hd-replicated  # Fast NVMe storage for music library
+  resources:
+    requests:
+      storage: 100Gi  # Combined size for Spotizerr downloads + Navidrome library
+  volumeMode: Filesystem

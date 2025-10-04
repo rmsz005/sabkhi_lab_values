@@ -96,14 +96,13 @@ persistence:
     size: 5Gi
     retain: true
   
-  # Music library volume
+  # Music library volume - shared with Spotizerr via music-library PVC
   music:
     enabled: true
     type: pvc
     mountPath: /music
-    storageClass: longhorn-nvme-replicated
-    accessMode: ReadWriteOnce
-    size: 20Gi
+    existingClaim: "music-library"  # Shared music library PVC (media namespace)
+    # storageClass, accessMode, size ignored when using existingClaim
     retain: true
 
 # Resource limits

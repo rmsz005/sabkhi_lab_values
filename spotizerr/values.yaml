@@ -40,11 +40,11 @@ spotizerr:
       size: 1Gi
       existingClaim: ""  # Will be created by the chart
     
-    # Downloads volume
+    # Downloads volume - shared with Navidrome via music-library PVC
     downloads:
       enabled: true
-      size: 50Gi  # Adjust based on your music library size
-      existingClaim: ""
+      size: 50Gi  # Size ignored when using existingClaim
+      existingClaim: "music-library"  # Shared music library PVC (media namespace)
     
     # Logs volume
     logs:
