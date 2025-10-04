@@ -71,10 +71,6 @@ server:
           paths:
             - path: /
               pathType: Prefix
-        - host: "" # Catch-all rule for direct IP access
-          paths:
-            - path: /
-              pathType: Prefix
       tls:
         - hosts:
             - immich.internal.rmsz005.com
