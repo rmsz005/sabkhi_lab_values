@@ -19,8 +19,8 @@ env:
   ND_LOGLEVEL: info
   ND_SESSIONTIMEOUT: 24h
   
-  # Music folder (mounted at /music via persistence)
-  ND_MUSICFOLDER: /music
+  # Music folder (mounted at /app/downloads via persistence, shared with Spotizerr)
+  ND_MUSICFOLDER: /app/downloads
   
   # Scanner settings
   ND_SCANSCHEDULE: "@every 1h"
@@ -100,7 +100,7 @@ persistence:
   music:
     enabled: true
     type: pvc
-    mountPath: /music
+    mountPath: /app/downloads  # Matches Spotizerr's download path
     existingClaim: "music-library"  # Shared music library PVC (media namespace)
     # storageClass, accessMode, size ignored when using existingClaim
     retain: true
