@@ -28,6 +28,28 @@ spec:
       serviceAccountName: {{ include "spotizerr.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.redis.enabled }}
+      initContainers:
+      - name: wait-for-redis
+        image: busybox:latest
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for Redis to be ready at {{ include "spotizerr.redis.fullname" . }}:{{ .Values.redis.service.port }}..."
+          until nc -z {{ include "spotizerr.redis.fullname" . }} {{ .Values.redis.service.port }}; do
+            echo "Redis is unavailable - sleeping for 2 seconds"
+            sleep 2
+          done
+          echo "Redis is ready!"
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
+      {{- end }}
       containers:
       - name: spotizerr
         image: "{{ .Values.spotizerr.image.repository }}:{{ .Values.spotizerr.image.tag | default .Chart.AppVersion }}"
