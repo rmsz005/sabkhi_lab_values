@@ -100,7 +100,7 @@ persistence:
   music:
     enabled: true
     type: pvc
-    mountPath: /music
+    mountPath: /app/downloads
     existingClaim: "music-library"  # Shared music library PVC (media namespace)
     # storageClass, accessMode, size ignored when using existingClaim
     retain: true
