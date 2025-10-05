@@ -50,6 +50,13 @@ main:
     accessMode: ReadWriteOnce
     size: 10Gi
 
+  # Environment variables
+  extraEnv:
+    - name: WEBHOOK_URL
+      value: "https://n8n.internal.rmsz005.com/"
+    - name: N8N_EDITOR_BASE_URL
+      value: "https://n8n.internal.rmsz005.com/"
+  
   # Reference sealed secrets
   extraSecretNamesForEnvFrom:
     - n8n-encryption-secret
