@@ -1,0 +1,69 @@
+---
+# Spotizerr Data PVC - Config, creds, watch, history
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spotizerr-data
+  namespace: media
+  labels:
+    app: spotizerr
+    component: data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-ssd-replicated
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Spotizerr Logs PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spotizerr-logs
+  namespace: media
+  labels:
+    app: spotizerr
+    component: logs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-ssd-replicated
+  resources:
+    requests:
+      storage: 2Gi
+---
+# Spotizerr Cache PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spotizerr-cache
+  namespace: media
+  labels:
+    app: spotizerr
+    component: cache
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-ssd-replicated
+  resources:
+    requests:
+      storage: 500Mi
+---
+# Spotizerr Redis PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: spotizerr-redis
+  namespace: media
+  labels:
+    app: spotizerr
+    component: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-ssd-replicated
+  resources:
+    requests:
+      storage: 2Gi
+

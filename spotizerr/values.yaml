@@ -18,7 +18,7 @@ spotizerr:
   resources:
     limits:
       cpu: 2000m
-      memory: 2Gi
+      memory: 3Gi
     requests:
       cpu: 500m
       memory: 512Mi
@@ -38,7 +38,7 @@ spotizerr:
     data:
       enabled: true
       size: 1Gi
-      existingClaim: ""  # Will be created by the chart
+      existingClaim: "spotizerr-data"  # Using existing PVC to preserve data
     
     # Downloads volume - shared with Navidrome via music-library PVC
     downloads:
@@ -50,7 +50,7 @@ spotizerr:
     logs:
       enabled: true
       size: 2Gi
-      existingClaim: ""
+      existingClaim: "spotizerr-logs"  # Using existing PVC to preserve data
     
     # Cache volume
     # Note: Mounted to /app/cache-volume instead of /app/.cache
@@ -58,7 +58,7 @@ spotizerr:
     cache:
       enabled: true
       size: 500Mi
-      existingClaim: ""
+      existingClaim: "spotizerr-cache"  # Using existing PVC to preserve data
   
   # Environment variables from .env file
   env:
@@ -145,7 +145,7 @@ redis:
     enabled: true
     storageClassName: "longhorn-ssd-replicated"
     size: 2Gi
-    existingClaim: ""
+    existingClaim: "spotizerr-redis"  # Using existing PVC to preserve data
   
   args:
     appendonly: true
