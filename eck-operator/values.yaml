@@ -1,0 +1,26 @@
+---
+# ECK Operator configuration
+# Manages Elastic resources in Kubernetes
+
+# Manage all namespaces by default
+managedNamespaces: []
+
+# Resources for the operator
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 150Mi
+
+replicaCount: 1
+
+# Enable/disable specific resource management
+# All enabled by default
+# config:
+#   validateStorageClass: true
+#   containerRegistry: docker.elastic.co
+#   maxConcurrentReconciles: 3
+#   setDefaultSecurityContext: auto
+

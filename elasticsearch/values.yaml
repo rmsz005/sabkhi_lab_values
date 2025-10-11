@@ -1,0 +1,53 @@
+---
+# Elasticsearch cluster configuration
+# Managed by ECK operator
+
+# Elasticsearch version
+version: 9.1.0
+
+# Full name override for cleaner resource names
+fullnameOverride: elasticsearch
+
+# HTTP service configuration
+http:
+  service:
+    spec:
+      type: ClusterIP
+
+# Node sets define the Elasticsearch node topology
+nodeSets:
+- name: default
+  count: 1
+  config:
+    # Disable mmap for lab environment
+    # For production, set vm.max_map_count=262144 on nodes instead
+    node.store.allow_mmap: false
+    
+  # Volume claim templates for persistent storage
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: longhorn-ssd-replicated
+      
+  podTemplate:
+    spec:
+      containers:
+      - name: elasticsearch
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 500m
+          limits:
+            memory: 4Gi
+            cpu: 2
+        env:
+        # Set JVM heap size (should be ~50% of container memory)
+        - name: ES_JAVA_OPTS
+          value: "-Xms1g -Xmx1g"
+
