@@ -70,15 +70,14 @@ ingress:
     # WebSocket support for Kibana real-time features
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
-    
+  
+  pathType: Prefix
+  
   hosts:
   - host: kibana.internal.rmsz005.com
-    paths:
-    - path: /
-      pathType: Prefix
+    path: /
       
   tls:
-  - secretName: kibana-tls
-    hosts:
-    - kibana.internal.rmsz005.com
+    enabled: true
+    secretName: kibana-tls
 
