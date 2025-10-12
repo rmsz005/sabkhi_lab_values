@@ -45,9 +45,6 @@ librespeed:
         nginx.ingress.kubernetes.io/proxy-buffering: "off"
         # Allow both HTTP and HTTPS
         nginx.ingress.kubernetes.io/ssl-redirect: "false"
-        # Disable compression to ensure accurate speed measurements
-        nginx.ingress.kubernetes.io/server-snippet: |
-          gzip off;
       hosts:
         - host: speedtest.internal.rmsz005.com
           paths:
