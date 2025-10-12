@@ -1,0 +1,10 @@
+apiVersion: v2
+name: openspeedtest
+description: Wrapper chart to deploy OpenSpeedTest via Helm dependency
+type: application
+version: 0.1.0
+dependencies:
+  - name: openspeedtest
+    version: 0.1.2
+    repository: https://openspeedtest.github.io/Helm-chart/
+

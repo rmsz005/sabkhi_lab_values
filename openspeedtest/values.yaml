@@ -1,0 +1,40 @@
+openspeedtest:
+  # Replica count
+  replicaCount: 1
+
+  # Image configuration
+  image:
+    repository: openspeedtest/latest
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 3000
+
+  # Ingress configuration
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt"
+    hosts:
+      - host: speedtest.internal.rmsz005.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: speedtest-tls
+        hosts:
+          - speedtest.internal.rmsz005.com
+
+  # Resources
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
