@@ -1,0 +1,11 @@
+apiVersion: v2
+name: librespeed
+description: Helm chart wrapper for LibreSpeed - HTML5 network speed test
+type: application
+version: 0.1.0
+appVersion: "5.4.1"
+dependencies:
+  - name: librespeed
+    version: 5.4.2
+    repository: https://k8s-at-home.com/charts/
+
