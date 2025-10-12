@@ -5,6 +5,10 @@ librespeed:
     pullPolicy: IfNotPresent
     # Pinned to specific version (5.4.1-ls246, latest as of 2025-10-12)
     tag: "5.4.1-ls246"
+  
+  # Controller settings
+  controller:
+    replicas: 1
 
   # Environment variables
   env:
