@@ -1,0 +1,84 @@
+---
+# Kibana configuration
+# Managed by ECK operator
+
+# Kibana version (must match Elasticsearch version)
+version: 9.1.0
+
+# Full name override for cleaner resource names
+fullnameOverride: kibana
+
+# Number of Kibana instances
+count: 1
+
+# Reference to Elasticsearch cluster
+elasticsearchRef:
+  name: elasticsearch
+  # Same namespace, so no namespace reference needed
+
+# Kibana configuration (kibana.yml)
+config:
+  # Required when behind ingress/load balancer
+  server.publicBaseUrl: "https://kibana.internal.rmsz005.com"
+  
+  # Optional: Set base path if you want to serve Kibana under a subpath
+  # server.basePath: "/kibana"
+  # server.rewriteBasePath: true
+
+# HTTP service configuration
+http:
+  service:
+    spec:
+      type: ClusterIP
+  tls:
+    selfSignedCertificate:
+      # Disable self-signed cert since we're using ingress with cert-manager
+      disabled: true
+
+# Pod template for resource allocation
+podTemplate:
+  spec:
+    containers:
+    - name: kibana
+      resources:
+        requests:
+          memory: 1Gi
+          cpu: 500m
+        limits:
+          memory: 2Gi
+          cpu: 2
+      env:
+      # Kibana configuration can also be set via environment variables
+      - name: NODE_OPTIONS
+        value: "--max-old-space-size=1536"
+
+# Ingress configuration for external access
+ingress:
+  enabled: true
+  className: nginx
+  
+  annotations:
+    # Cert-manager annotations for automatic TLS
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    cert-manager.io/common-name: "kibana.internal.rmsz005.com"
+    
+    # NGINX specific annotations
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    
+    # WebSocket support for Kibana real-time features
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    
+  hosts:
+  - host: kibana.internal.rmsz005.com
+    paths:
+    - path: /
+      pathType: Prefix
+      
+  tls:
+  - secretName: kibana-tls
+    hosts:
+    - kibana.internal.rmsz005.com
+
