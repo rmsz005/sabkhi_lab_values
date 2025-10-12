@@ -22,6 +22,9 @@ openspeedtest:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
       nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      # Disable gzip to prevent compression of upload test data (causes unrealistic speeds)
+      nginx.ingress.kubernetes.io/server-snippet: |
+        gzip off;
     hosts:
       - host: speedtest.internal.rmsz005.com
         paths:
