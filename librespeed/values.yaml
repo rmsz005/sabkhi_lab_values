@@ -38,11 +38,12 @@ librespeed:
       enabled: true
       ingressClassName: nginx
       annotations:
-        cert-manager.io/cluster-issuer: "letsencrypt"
         # Allow large uploads for speed testing (50MB)
         nginx.ingress.kubernetes.io/proxy-body-size: "50m"
         nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
         nginx.ingress.kubernetes.io/proxy-buffering: "off"
+        # Disable SSL redirect
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
         # Disable compression to ensure accurate speed measurements
         nginx.ingress.kubernetes.io/server-snippet: |
           gzip off;
@@ -51,10 +52,6 @@ librespeed:
           paths:
             - path: /
               pathType: Prefix
-      tls:
-        - secretName: speedtest-tls
-          hosts:
-            - speedtest.internal.rmsz005.com
 
   # Resource limits
   resources:
