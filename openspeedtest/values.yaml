@@ -5,8 +5,8 @@ openspeedtest:
   # Image configuration
   image:
     repository: openspeedtest/latest
-    pullPolicy: IfNotPresent
-    tag: ""
+    pullPolicy: Always
+    tag: "v2.0.6"
 
   # Service configuration
   service:
@@ -22,9 +22,13 @@ openspeedtest:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
       nginx.ingress.kubernetes.io/proxy-buffering: "off"
-      # Disable gzip to prevent compression of upload test data (causes unrealistic speeds)
+      # Force HTTP/1.1 and disable all compression
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
       nginx.ingress.kubernetes.io/server-snippet: |
         gzip off;
+        gzip_proxied off;
+        gunzip off;
     hosts:
       - host: speedtest.internal.rmsz005.com
         paths:
