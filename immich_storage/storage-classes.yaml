@@ -1,5 +1,6 @@
 ---
-# HD Storage Class for Immich Library (1TB with 2 replicas)
+# best-effort data locality
+## Multi Replica Storage Classes
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -9,14 +10,13 @@ metadata:
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
 reclaimPolicy: Retain
-volumeBindingMode: WaitForFirstConsumer  # Better for specific disk requirements  
+volumeBindingMode: WaitForFirstConsumer 
 parameters:
   numberOfReplicas: "2"
   staleReplicaTimeout: "2880"  # 48 hours
   diskSelector: "hd"
-  dataLocality: "best-effort"  # Better performance with data locality
+  dataLocality: "best-effort"
 ---
-# NVMe Storage Class for PostgreSQL (Primary choice)
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -27,14 +27,13 @@ metadata:
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
 reclaimPolicy: Retain
-volumeBindingMode: WaitForFirstConsumer  # Better for specific disk requirements
+volumeBindingMode: WaitForFirstConsumer
 parameters:
   numberOfReplicas: "2"
-  staleReplicaTimeout: "2880"  # 48 hours
+  staleReplicaTimeout: "2880"
   diskSelector: "nvme"
-  dataLocality: "best-effort"  # Better PostgreSQL performance
+  dataLocality: "best-effort"
 ---
-# SSD Storage Class for PostgreSQL (Fallback choice)
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -48,6 +47,163 @@ reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
 parameters:
   numberOfReplicas: "2"
-  staleReplicaTimeout: "2880"  # 48 hours
+  staleReplicaTimeout: "2880"  #
   diskSelector: "ssd"
   dataLocality: "best-effort"
+---
+## Single Replica Storage Classes
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-hd-single
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer 
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "2880"  # 48 hours
+  diskSelector: "hd"
+  dataLocality: "best-effort"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-nvme-single
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "NVMe storage for maximum PostgreSQL performance"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "2880"
+  diskSelector: "nvme"
+  dataLocality: "best-effort"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-ssd-single
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false" 
+    description: "SSD storage fallback for PostgreSQL"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "2880"  #
+  diskSelector: "ssd"
+  dataLocality: "best-effort"
+
+
+
+---
+# strict local data locality
+## Multi Replica Storage Classes
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-hd-replicated-strict
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer 
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"  # 48 hours
+  diskSelector: "hd"
+  dataLocality: "stric-local"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-nvme-replicated-strict
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "NVMe storage for maximum PostgreSQL performance"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"
+  diskSelector: "nvme"
+  dataLocality: "stric-local"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-ssd-replicated-strict
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false" 
+    description: "SSD storage fallback for PostgreSQL"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"  #
+  diskSelector: "ssd"
+  dataLocality: "stric-local"
+---
+## Single Replica Storage Classes
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-hd-single-strict
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer 
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "2880"  # 48 hours
+  diskSelector: "hd"
+  dataLocality: "stric-local"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-nvme-single-strict
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "NVMe storage for maximum PostgreSQL performance"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "2880"
+  diskSelector: "nvme"
+  dataLocality: "stric-local"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-ssd-single-strict
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false" 
+    description: "SSD storage fallback for PostgreSQL"
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "2880"  #
+  diskSelector: "ssd"
+  dataLocality: "stric-local"
