@@ -59,10 +59,9 @@ falco:
   # Buffering
   buffered_outputs: true
   
-  # Enable HTTP output for metrics
+  # HTTP output (disabled - using stdout instead)
   http_output:
-    enabled: true
-    url: ""  # Can add webhook URL later
+    enabled: false
   
   # File outputs (goes to stdout, then to Loki via Promtail)
   file_output:
