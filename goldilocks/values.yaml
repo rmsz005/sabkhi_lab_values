@@ -1,0 +1,82 @@
+---
+# Goldilocks configuration
+# Resource recommendation tool
+
+# VPA and metrics-server are managed separately
+vpa:
+  enabled: false
+
+metrics-server:
+  enabled: false
+
+# Controller configuration
+controller:
+  enabled: true
+  flags:
+    # Monitor all namespaces with goldilocks.fairwinds.com/enabled=true label
+    on-by-default: false
+  logVerbosity: "2"
+  
+  resources:
+    requests:
+      cpu: 25m
+      memory: 256Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
+  
+  rbac:
+    create: true
+    enableArgoproj: true
+
+# Dashboard configuration
+dashboard:
+  enabled: true
+  replicaCount: 2
+  
+  service:
+    type: ClusterIP
+    port: 80
+  
+  flags:
+    # Monitor all namespaces with goldilocks.fairwinds.com/enabled=true label
+    on-by-default: false
+  
+  logVerbosity: "2"
+  
+  # Exclude sidecar containers
+  excludeContainers: "linkerd-proxy,istio-proxy"
+  
+  resources:
+    requests:
+      cpu: 25m
+      memory: 256Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
+  
+  rbac:
+    create: true
+    enableArgoproj: true
+  
+  # Ingress configuration for dashboard
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt"
+      cert-manager.io/common-name: "goldilocks.internal.rmsz005.com"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    
+    hosts:
+    - host: goldilocks.internal.rmsz005.com
+      paths:
+      - path: /
+        type: ImplementationSpecific
+    
+    tls:
+    - secretName: goldilocks-tls
+      hosts:
+      - goldilocks.internal.rmsz005.com
+

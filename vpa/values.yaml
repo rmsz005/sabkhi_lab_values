@@ -1,0 +1,61 @@
+---
+# Vertical Pod Autoscaler configuration
+# Required for Goldilocks resource recommendations
+
+# RBAC
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  automountServiceAccountToken: true
+
+# Recommender - REQUIRED for Goldilocks
+# Analyzes workloads and generates resource recommendations
+recommender:
+  enabled: true
+  replicaCount: 1
+  
+  extraArgs:
+    v: "4"
+    # Minimum CPU recommendation (in millicores)
+    pod-recommendation-min-cpu-millicores: 15
+    # Minimum memory recommendation (in MB)
+    pod-recommendation-min-memory-mb: 100
+  
+  resources:
+    requests:
+      cpu: 50m
+      memory: 500Mi
+    limits:
+      cpu: 200m
+      memory: 1Gi
+  
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    seccompProfile:
+      type: RuntimeDefault
+  
+  securityContext:
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+
+# Updater - DISABLED
+# Not required for Goldilocks (only for automatic pod updates)
+updater:
+  enabled: false
+
+# Admission Controller - DISABLED
+# Not required for Goldilocks (only for automatic admission control)
+# Disabling for safety as it creates a MutatingWebhookConfiguration
+admissionController:
+  enabled: false
+  # If enabled in the future, set safe defaults:
+  # generateCertificate: true
+  # mutatingWebhookConfiguration:
+  #   failurePolicy: Ignore
+
