@@ -1,0 +1,68 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":enablePreCommit"
+  ],
+  "timezone": "Europe/Paris",
+  "labels": ["dependencies", "renovate"],
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "rebaseWhen": "behind-base-branch",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 0,
+  
+  "packageRules": [
+    {
+      "description": "Docker image updates in Helm values",
+      "matchDatasources": ["docker"],
+      "separateMinorPatch": true,
+      "schedule": ["every weekend"]
+    },
+    {
+      "description": "Auto-merge patch updates",
+      "matchUpdateTypes": ["patch"],
+      "automerge": false,
+      "labels": ["dependencies", "renovate", "automerge"]
+    },
+    {
+      "description": "Group minor updates",
+      "matchUpdateTypes": ["minor"],
+      "groupName": "minor-updates",
+      "schedule": ["every weekend"]
+    },
+    {
+      "description": "Major updates require explicit review",
+      "matchUpdateTypes": ["major"],
+      "labels": ["dependencies", "renovate", "major-update"],
+      "reviewers": ["rmsz005"]
+    },
+    {
+      "description": "Critical security updates - immediate",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["patch"],
+      "matchPackagePatterns": [".*"],
+      "labels": ["security", "renovate"],
+      "schedule": ["at any time"]
+    }
+  ],
+  
+  "regexManagers": [
+    {
+      "description": "Container images in Helm values files",
+      "fileMatch": ["^.*\\/values\\.yaml$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s+.*?:\\s*[\"']?(?<currentValue>.*?)[\"']?",
+        "repository:\\s*(?<depName>[^\\s]+)\\s+tag:\\s*[\"']?(?<currentValue>[^\\s\"']+)[\"']?"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  
+  "helm-values": {
+    "fileMatch": ["\\.yaml$"]
+  }
+}
+
