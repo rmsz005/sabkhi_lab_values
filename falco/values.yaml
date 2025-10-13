@@ -45,7 +45,7 @@ containerSecurityContext:
 
 # Falco configuration
 falco:
-  # Log to stdout (captured by Promtail → Loki)
+  # JSON output format
   json_output: true
   json_include_output_property: true
   json_include_tags_property: true
@@ -59,19 +59,28 @@ falco:
   # Buffering
   buffered_outputs: true
   
-  # HTTP output (disabled - using stdout instead)
+  # gRPC output to Falcosidekick
+  grpc:
+    enabled: true
+    bind_address: "unix:///run/falco/falco.sock"
+    threadiness: 0
+  
+  grpc_output:
+    enabled: true
+  
+  # HTTP output (disabled)
   http_output:
     enabled: false
   
-  # File outputs (goes to stdout, then to Loki via Promtail)
+  # File output (disabled)
   file_output:
     enabled: false
   
-  # Program output
+  # Program output (disabled)
   program_output:
     enabled: false
   
-  # Stdout output (captured by Promtail)
+  # Stdout output (also enabled for Promtail)
   stdout_output:
     enabled: true
 
