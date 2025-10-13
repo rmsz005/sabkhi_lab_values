@@ -82,10 +82,60 @@ metrics:
     enabled: false  # Enable later for Prometheus scraping
   interval: 1h
 
-# Falcosidekick for advanced outputs (Slack, PagerDuty, etc.)
-# Disabled for now, can enable later
+# Falcosidekick for forwarding Falco events to various outputs
 falcosidekick:
-  enabled: false
+  enabled: true
+  
+  # WebUI for visualizing Falco events
+  webui:
+    enabled: true
+    replicaCount: 1
+    
+    # Resources for WebUI
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    
+    # Ingress for WebUI
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt"
+        cert-manager.io/common-name: "falco.internal.rmsz005.com"
+      hosts:
+      - host: falco.internal.rmsz005.com
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - secretName: falco-webui-tls
+        hosts:
+        - falco.internal.rmsz005.com
+  
+  # Loki output configuration
+  config:
+    loki:
+      hostport: http://loki.monitoring.svc.cluster.local:3100
+      minimumpriority: warning
+    
+    # Optional: Add Slack, Discord, etc. later
+    # slack:
+    #   webhookurl: ""
+    #   minimumpriority: warning
+  
+  # Resources for Falcosidekick
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
 # Falcoctl for artifact management
 falcoctl:
