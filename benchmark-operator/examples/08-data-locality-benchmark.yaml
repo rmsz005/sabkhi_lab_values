@@ -1,0 +1,66 @@
+---
+# Benchmark with STRICT data locality - volume must be on same node as pod
+# This tests best-case local performance
+
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: bench-nvme-strict-locality
+  namespace: benchmark-operator
+spec:
+  cleanup: true
+  elasticsearch:
+    url: https://elastic:1BAg61MNY02o2Mps09or78BH@elasticsearch-es-http.elasticsearch.svc:9200
+    verify_cert: false
+  workload:
+    name: "fio_distributed"
+    args:
+      prefill: false
+      samples: 1
+      servers: 1
+      jobs: [write, read]
+      bs: [64KiB]
+      numjobs: [2]
+      iodepth: [8]
+      read_runtime: 30
+      write_runtime: 30
+      read_ramp_time: 5
+      write_ramp_time: 5
+      filesize: 1GiB
+      storageclass: longhorn-nvme-replicated
+      storagesize: 5Gi
+      # Pin to specific node for true data locality
+      pin_server: "node1.internal.rmsz005.com"  # Change to your node name
+
+---
+# Compare: benchmark WITHOUT locality constraints (may hit network)
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: bench-nvme-no-locality
+  namespace: benchmark-operator
+spec:
+  cleanup: true
+  elasticsearch:
+    url: https://elastic:1BAg61MNY02o2Mps09or78BH@elasticsearch-es-http.elasticsearch.svc:9200
+    verify_cert: false
+  workload:
+    name: "fio_distributed"
+    args:
+      prefill: false
+      samples: 1
+      servers: 1
+      jobs: [write, read]
+      bs: [64KiB]
+      numjobs: [2]
+      iodepth: [8]
+      read_runtime: 30
+      write_runtime: 30
+      read_ramp_time: 5
+      write_ramp_time: 5
+      filesize: 1GiB
+      storageclass: longhorn-nvme-replicated
+      storagesize: 5Gi
+      # No pin - pod can schedule anywhere
+
+

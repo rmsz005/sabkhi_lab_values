@@ -1,0 +1,25 @@
+---
+# TCP Bandwidth Test
+# Tests basic TCP bandwidth - pods will schedule randomly across cluster nodes
+
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: net-tcp-bandwidth
+  namespace: benchmark-operator
+spec:
+  cleanup: true
+  elasticsearch:
+    url: https://elastic:1BAg61MNY02o2Mps09or78BH@elasticsearch-es-http.elasticsearch.svc:9200
+    verify_cert: false
+  workload:
+    name: "iperf3"
+    args:
+      runtime: 60
+      num_streams: 4
+      protocol: tcp
+      pairs: 1
+      test_type: "stream"
+      samples: 3
+
+

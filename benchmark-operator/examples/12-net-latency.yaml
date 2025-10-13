@@ -1,0 +1,26 @@
+---
+# Network Latency Test (using iperf3)
+# Tests latency with small packet sizes using iperf3 in bidirectional mode
+# Pods schedule randomly across nodes
+
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: net-latency
+  namespace: benchmark-operator
+spec:
+  cleanup: true
+  elasticsearch:
+    url: https://elastic:1BAg61MNY02o2Mps09or78BH@elasticsearch-es-http.elasticsearch.svc:9200
+    verify_cert: false
+  workload:
+    name: "iperf3"
+    args:
+      runtime: 60
+      # Single stream for latency measurement
+      num_streams: 1
+      protocol: tcp
+      pairs: 1
+      test_type: "stream"
+      samples: 3
+

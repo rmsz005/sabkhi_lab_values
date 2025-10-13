@@ -3,7 +3,7 @@
 prometheus:
   prometheusSpec:
     # Data retention
-    retention: 7d
+    retention: 14d
     retentionSize: 18GB  # Leave some headroom in 20GB volume
     
     # Storage configuration with NVMe and replication

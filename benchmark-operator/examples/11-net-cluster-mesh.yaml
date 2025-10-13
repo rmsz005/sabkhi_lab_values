@@ -1,0 +1,27 @@
+---
+# Network Cluster Mesh Test
+# Creates multiple client-server pairs that distribute across all nodes
+# This tests network performance across your entire cluster
+
+apiVersion: ripsaw.cloudbulldozer.io/v1alpha1
+kind: Benchmark
+metadata:
+  name: net-cluster-mesh2
+  namespace: benchmark-operator
+spec:
+  cleanup: true
+  elasticsearch:
+    url: https://elastic:1BAg61MNY02o2Mps09or78BH@elasticsearch-es-http.elasticsearch.svc:9200
+    verify_cert: false
+  workload:
+    name: "iperf3"
+    args:
+      runtime: 60
+      num_streams: 2
+      protocol: tcp
+      # Multiple pairs will spread across nodes
+      pairs: 3
+      test_type: "stream"
+      samples: 3
+
+
