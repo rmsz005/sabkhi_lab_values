@@ -148,6 +148,10 @@ redis:
   # Enable Prometheus metrics exporter
   metrics:
     enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/redis-exporter
+      tag: 1.58.0-debian-12-r4  # Use known stable version
     service:
       port: 9121
     serviceMonitor:
