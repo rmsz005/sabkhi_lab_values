@@ -23,6 +23,10 @@ nodeSets:
     # For production, set vm.max_map_count=262144 on nodes instead
     node.store.allow_mmap: false
     
+    # Reduce logging verbosity to avoid spammy task completion logs
+    logger.org.elasticsearch.tasks: warn
+    logger.level: info
+    
   # Volume claim templates for persistent storage
   volumeClaimTemplates:
   - metadata:
