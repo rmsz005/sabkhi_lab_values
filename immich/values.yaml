@@ -51,7 +51,7 @@ server:
   service:
     main:
       ports:
-        metrics:
+        metrics-api:
           enabled: true
           port: 8081
           protocol: TCP
