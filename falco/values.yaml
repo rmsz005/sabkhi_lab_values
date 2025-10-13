@@ -59,18 +59,10 @@ falco:
   # Buffering
   buffered_outputs: true
   
-  # gRPC output to Falcosidekick
-  grpc:
-    enabled: true
-    bind_address: "unix:///run/falco/falco.sock"
-    threadiness: 0
-  
-  grpc_output:
-    enabled: true
-  
-  # HTTP output (disabled)
+  # HTTP output to Falcosidekick
   http_output:
-    enabled: false
+    enabled: true
+    url: "http://falco-falcosidekick:2801"
   
   # File output (disabled)
   file_output:
