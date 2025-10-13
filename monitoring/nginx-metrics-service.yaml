@@ -1,6 +1,6 @@
 ---
 # Service for NGINX Ingress Controller metrics
-# Exposes port 10254 for Prometheus scraping
+# This is a raw manifest that will be applied by the monitoring ArgoCD app
 apiVersion: v1
 kind: Service
 metadata:
@@ -9,7 +9,6 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-    app.kubernetes.io/component: controller
 spec:
   type: ClusterIP
   ports:

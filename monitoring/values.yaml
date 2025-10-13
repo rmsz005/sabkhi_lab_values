@@ -130,11 +130,15 @@ defaultRules:
 additionalServiceMonitors:
   # Monitor nginx-ingress
   - name: nginx-ingress
+    namespaceSelector:
+      matchNames:
+        - ingress-nginx
     selector:
       matchLabels:
         app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
     endpoints:
-    - port: prometheus
+    - port: metrics
       path: /metrics
       interval: 30s
   
