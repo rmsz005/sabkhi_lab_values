@@ -53,8 +53,8 @@ falco:
   # Log level
   log_level: info
   
-  # Rule priorities to alert on
-  priority: warning
+  # Rule priorities to alert on (notice = informational, warning = suspicious, error = critical)
+  priority: notice
   
   # Buffering
   buffered_outputs: true
