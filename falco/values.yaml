@@ -1,0 +1,99 @@
+---
+# Falco runtime security configuration
+# Detects suspicious behavior and threats in real-time
+
+# DaemonSet to run on all nodes
+controller:
+  kind: daemonset
+
+# Driver configuration - use modern eBPF (best performance, least privilege)
+driver:
+  enabled: true
+  kind: modern_ebpf
+  modernEbpf:
+    # Run with least privilege (no privileged container!)
+    leastPrivileged: true
+    bufSizePreset: 4
+    dropFailedExit: false
+
+# Resources
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+
+# Tolerations to run on all nodes including control plane
+tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/master
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+
+# Security context (least privilege for modern_ebpf)
+containerSecurityContext:
+  capabilities:
+    add:
+      - BPF
+      - SYS_RESOURCE
+      - PERFMON
+      - SYS_PTRACE
+    drop:
+      - ALL
+
+# Falco configuration
+falco:
+  # Log to stdout (captured by Promtail → Loki)
+  json_output: true
+  json_include_output_property: true
+  json_include_tags_property: true
+  
+  # Log level
+  log_level: info
+  
+  # Rule priorities to alert on
+  priority: warning
+  
+  # Buffering
+  buffered_outputs: true
+  
+  # Enable HTTP output for metrics
+  http_output:
+    enabled: true
+    url: ""  # Can add webhook URL later
+  
+  # File outputs (goes to stdout, then to Loki via Promtail)
+  file_output:
+    enabled: false
+  
+  # Program output
+  program_output:
+    enabled: false
+  
+  # Stdout output (captured by Promtail)
+  stdout_output:
+    enabled: true
+
+# Metrics exporter
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false  # Enable later for Prometheus scraping
+  interval: 1h
+
+# Falcosidekick for advanced outputs (Slack, PagerDuty, etc.)
+# Disabled for now, can enable later
+falcosidekick:
+  enabled: false
+
+# Falcoctl for artifact management
+falcoctl:
+  artifact:
+    install:
+      enabled: true
+      # Install default ruleset
+      args:
+        - --log-format=json
+

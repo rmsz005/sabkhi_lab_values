@@ -1,0 +1,60 @@
+---
+# ArgoCD Image Updater configuration
+# Automatically updates container images in ArgoCD applications
+
+# Single replica (recommended)
+replicaCount: 1
+
+image:
+  repository: quay.io/argoprojlabs/argocd-image-updater
+  pullPolicy: Always
+  tag: v0.17.0
+
+# Configuration
+config:
+  # Use Kubernetes API to manage applications (simpler, no ArgoCD API needed)
+  applicationsAPIKind: "kubernetes"
+  
+  # Disable kubernetes events (reduce noise)
+  disableKubeEvents: false
+  
+  # Git commit configuration (used when writing back to git)
+  gitCommitUser: "argocd-image-updater"
+  gitCommitMail: "argocd-image-updater@sabkhi-lab.local"
+  
+  # Log level
+  logLevel: "info"
+
+# Extra arguments
+extraArgs:
+  # Check for updates every 2 minutes (default is 2m)
+  - --interval
+  - 2m
+  # Only process apps in argocd namespace
+  - --argocd-namespace
+  - argocd
+
+# Resources
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+# Service account
+serviceAccount:
+  create: true
+  name: argocd-image-updater
+
+# RBAC
+rbac:
+  enabled: true
+
+# Metrics (for Prometheus scraping)
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false  # Enable later if you want Prometheus scraping
+
