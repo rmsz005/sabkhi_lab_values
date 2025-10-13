@@ -13,8 +13,8 @@ metrics-server:
 controller:
   enabled: true
   flags:
-    # Monitor all namespaces with goldilocks.fairwinds.com/enabled=true label
-    on-by-default: false
+    # Monitor all namespaces except those labeled goldilocks.fairwinds.com/enabled=false
+    on-by-default: true
   logVerbosity: "2"
   
   resources:
@@ -39,8 +39,8 @@ dashboard:
     port: 80
   
   flags:
-    # Monitor all namespaces with goldilocks.fairwinds.com/enabled=true label
-    on-by-default: false
+    # Monitor all namespaces except those labeled goldilocks.fairwinds.com/enabled=false
+    on-by-default: true
   
   logVerbosity: "2"
   
