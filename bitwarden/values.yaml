@@ -39,18 +39,48 @@ general:
     smtpSslOverride: "false"
     smtpStartTls: "true"  # Force STARTTLS
   
-  # Use ReadWriteMany for attachments storage
-  volumeAccessMode: "ReadWriteMany"
+  # Use ReadWriteOnce for better compatibility with Longhorn
+  volumeAccessMode: "ReadWriteOnce"
   
   # Disable cloud communication (self-hosted only)
   enableCloudCommunication: false
 
-# Use external PostgreSQL
+# Built-in SQL Server configuration
 database:
-  enabled: false  # Disable built-in SQL pod
+  enabled: true  # Use built-in SQL Server
   
-# External database configuration
-# Connection string will be provided via secret
+  # SQL Server 2022 image
+  image:
+    name: mcr.microsoft.com/mssql/server
+    tag: 2022-CU12-ubuntu-22.04
+  
+  # Resources for SQL Server
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "100m"
+    limits:
+      memory: "4Gi"
+      cpu: "1000m"
+  
+  # PVC configuration for SQL Server
+  volume:
+    data:
+      size: 10Gi
+      storageClass: "longhorn-ssd-replicated"
+      accessMode: ReadWriteOnce
+    
+    log:
+      size: 10Gi
+      storageClass: "longhorn-ssd-replicated"
+      accessMode: ReadWriteOnce
+    
+    backups:
+      size: 5Gi
+      storageClass: "longhorn-hd-replicated"
+      accessMode: ReadWriteOnce
+
+# Shared storage for attachments
 sharedStorageClassName: "longhorn-hd-replicated"
 
 # Component-specific overrides
@@ -150,4 +180,3 @@ component:
 secrets:
   secretName: bitwarden-secrets
   secretProviderClass: ""
-
