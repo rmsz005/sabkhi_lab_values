@@ -145,19 +145,5 @@ redis:
       limits:
         memory: 512Mi
         cpu: 1000m
-  # Enable Prometheus metrics exporter
-  metrics:
-    enabled: true
-    service:
-      port: 9121
-    serviceMonitor:
-      enabled: false  # We'll create ServiceMonitor separately
-    resources:
-      requests:
-        cpu: 50m
-        memory: 64Mi
-      limits:
-        cpu: 100m
-        memory: 128Mi
 
 # PVC is created by immich-storage ArgoCD application
