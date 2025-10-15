@@ -1,0 +1,176 @@
+---
+# Plane CE Helm Chart Values
+# Chart: plane/plane-ce v1.3.1
+# App Version: 1.0.0
+
+planeVersion: "v1.0.0"
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  appHost: "plane.internal.rmsz005.com"
+  minioHost: ""
+  rabbitmqHost: ""
+  ingressClass: "nginx"
+  ingress_annotations:
+    # Increased for file uploads
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    cert-manager.io/common-name: "plane.internal.rmsz005.com"
+
+# SSL Configuration
+ssl:
+  generateCerts: false  # Using existing cert-manager cluster-issuer
+  createIssuer: false
+  tls_secret_name: "plane-tls"  # Secret name for cert-manager to create
+
+# Redis Configuration
+redis:
+  local_setup: true
+  image: valkey/valkey:7.2.5-alpine
+  servicePort: 6379
+  storageClass: "longhorn-ssd-replicated"
+  volumeSize: 500Mi  # Increased from default 100Mi for better performance
+  pullPolicy: IfNotPresent
+  assign_cluster_ip: false
+
+# PostgreSQL Configuration
+postgres:
+  local_setup: true
+  image: postgres:15.7-alpine
+  servicePort: 5432
+  storageClass: "longhorn-ssd-replicated"
+  volumeSize: 5Gi  # Increased from default 1Gi for production use
+  pullPolicy: IfNotPresent
+  assign_cluster_ip: false
+
+# RabbitMQ Configuration
+rabbitmq:
+  local_setup: true
+  image: rabbitmq:3.13.6-management-alpine
+  pullPolicy: IfNotPresent
+  servicePort: 5672
+  managementPort: 15672
+  storageClass: "longhorn-ssd-replicated"
+  volumeSize: 500Mi  # Increased from default 100Mi
+  # Credentials managed by sealed secret (plane-rabbitmq-secret)
+  assign_cluster_ip: false
+
+# MinIO Configuration (Object Storage)
+minio:
+  image: minio/minio:latest
+  image_mc: minio/mc:latest
+  local_setup: true
+  pullPolicy: IfNotPresent
+  # Credentials managed by sealed secret (plane-docstore-secret)
+  storageClass: "longhorn-ssd-replicated"
+  volumeSize: 10Gi  # Storage for uploads, attachments, etc.
+  assign_cluster_ip: false
+  env:
+    minio_endpoint_ssl: false
+
+# Web Frontend
+web:
+  replicas: 1
+  memoryLimit: 1000Mi
+  cpuLimit: 500m
+  cpuRequest: 50m
+  memoryRequest: 50Mi
+  image: artifacts.plane.so/makeplane/plane-frontend
+  pullPolicy: Always
+  assign_cluster_ip: false
+
+# Space Component
+space:
+  replicas: 1
+  memoryLimit: 1000Mi
+  cpuLimit: 500m
+  cpuRequest: 50m
+  memoryRequest: 50Mi
+  image: artifacts.plane.so/makeplane/plane-space
+  pullPolicy: Always
+  assign_cluster_ip: false
+
+# Admin Component
+admin:
+  replicas: 1
+  memoryLimit: 1000Mi
+  cpuLimit: 500m
+  cpuRequest: 50m
+  memoryRequest: 50Mi
+  image: artifacts.plane.so/makeplane/plane-admin
+  pullPolicy: Always
+  assign_cluster_ip: false
+
+# Live Component
+live:
+  replicas: 1
+  memoryLimit: 1000Mi
+  cpuLimit: 500m
+  cpuRequest: 50m
+  memoryRequest: 50Mi
+  image: artifacts.plane.so/makeplane/plane-live
+  pullPolicy: Always
+  assign_cluster_ip: false
+
+# API Backend
+api:
+  replicas: 1
+  memoryLimit: 1000Mi
+  cpuLimit: 500m
+  cpuRequest: 50m
+  memoryRequest: 50Mi
+  image: artifacts.plane.so/makeplane/plane-backend
+  pullPolicy: Always
+  assign_cluster_ip: false
+
+# Worker Component
+worker:
+  replicas: 1
+  memoryLimit: 1000Mi
+  cpuLimit: 500m
+  cpuRequest: 50m
+  memoryRequest: 50Mi
+  image: artifacts.plane.so/makeplane/plane-backend
+  pullPolicy: Always
+
+# Beat Worker Component
+beatworker:
+  replicas: 1
+  memoryLimit: 1000Mi
+  cpuLimit: 500m
+  cpuRequest: 50m
+  memoryRequest: 50Mi
+  image: artifacts.plane.so/makeplane/plane-backend
+  pullPolicy: Always
+
+# External Secrets - Use sealed secrets for production
+external_secrets:
+  rabbitmq_existingSecret: 'plane-rabbitmq-secret'
+  pgdb_existingSecret: 'plane-pgdb-secret'
+  doc_store_existingSecret: 'plane-docstore-secret'
+  app_env_existingSecret: 'plane-app-env-secret'
+  live_env_existingSecret: 'plane-live-env-secret'
+
+# Environment Variables
+# Credentials managed by sealed secrets (see external_secrets section)
+env:
+  # PostgreSQL - credentials from plane-pgdb-secret
+  pgdb_username: plane
+  pgdb_name: plane
+
+  # MinIO/S3 Storage - credentials from plane-docstore-secret
+  docstore_bucket: "uploads"
+  doc_upload_size_limit: "52428800"  # 50MB
+
+  # Django secrets managed by plane-app-env-secret and plane-live-env-secret
+
+  # CORS (adjust if needed)
+  cors_allowed_origins: "https://plane.internal.rmsz005.com"
+
+  # Rate Limiting
+  api_key_rate_limit: "60/minute"
+
+  # Cluster Domain
+  default_cluster_domain: cluster.local
+
