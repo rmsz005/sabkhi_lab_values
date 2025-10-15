@@ -8,7 +8,7 @@ longhorn:
   
   # Cloudflare R2 backup configuration
   defaultBackupStore:
-    backupTarget: s3://sabkhi-lab-backups@eu/
+    backupTarget: s3://sabkhi-lab-backups@auto/
     backupTargetCredentialSecret: longhorn-r2-secret
     pollInterval: 300
   
