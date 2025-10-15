@@ -7,13 +7,12 @@ longhorn:
     upgradeVersionCheck: false
   
   # Cloudflare R2 backup configuration
-  defaultSettings:
-    # Backup target configuration
+  defaultBackupStore:
     backupTarget: s3://sabkhi-lab-backups@eu/
     backupTargetCredentialSecret: longhorn-r2-secret
-    backupstorePollInterval: 300
-    # Use virtual-hosted-style for R2 compatibility
-    backupTargetURLIsVirtual: true
+    pollInterval: 300
+  
+  defaultSettings:
     # Fail if backup fails
     allowRecurringJobWhileVolumeDetached: false
     # Concurrent backup jobs
