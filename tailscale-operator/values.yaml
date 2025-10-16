@@ -1,0 +1,36 @@
+---
+# Tailscale Kubernetes Operator
+# https://tailscale.com/kb/1236/kubernetes-operator
+
+# OAuth credentials (sealed secret: operator-oauth)
+oauth:
+  clientId: ""
+  clientSecret: ""
+
+operatorConfig:
+  existingSecret: operator-oauth
+
+# API Server Proxy disabled for security
+apiServerProxyConfig:
+  mode: "false"
+
+image:
+  repo: tailscale/k8s-operator
+  tag: ""
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
