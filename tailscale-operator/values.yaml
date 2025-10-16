@@ -9,6 +9,8 @@ oauth:
 
 operatorConfig:
   existingSecret: operator-oauth
+  defaultTags:
+    - tag:k8s-operator
 
 # API Server Proxy disabled for security
 apiServerProxyConfig:
