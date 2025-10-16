@@ -8,6 +8,7 @@ metadata:
     tailscale.com/expose: "true"
     tailscale.com/hostname: "navidrome"
     tailscale.com/tags: "tag:k8s"
+    tailscale.com/proxy-to: "http://navidrome.media.svc.cluster.local:4533"
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
