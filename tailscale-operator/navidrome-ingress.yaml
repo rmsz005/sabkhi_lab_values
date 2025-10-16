@@ -18,3 +18,7 @@ spec:
     targetPort: 4533
     protocol: TCP
     name: http
+  - port: 443
+    targetPort: 4533
+    protocol: TCP
+    name: https
