@@ -5,7 +5,7 @@ metadata:
   name: immich-tailscale
   namespace: immich
   annotations:
-    tailscale.com/tags: "tag:k8s"
+    tailscale.com/tags: "tag:media,tag:immich"
 spec:
   ingressClassName: tailscale
   rules:
