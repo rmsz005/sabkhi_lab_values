@@ -5,7 +5,7 @@ metadata:
   name: navidrome-tailscale
   namespace: media
   annotations:
-    tailscale.com/tags: "tag:media,tag:navidrome"
+    tailscale.com/tags: "tag:navidrome"
 spec:
   ingressClassName: tailscale
   rules:

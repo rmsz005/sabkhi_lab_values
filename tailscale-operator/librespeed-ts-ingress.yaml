@@ -5,7 +5,7 @@ metadata:
   name: librespeed-tailscale
   namespace: librespeed
   annotations:
-    tailscale.com/tags: "tag:utils,tag:librespeed"
+    tailscale.com/tags: "tag:librespeed"
 spec:
   ingressClassName: tailscale
   rules:
