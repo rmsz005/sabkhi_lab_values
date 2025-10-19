@@ -35,7 +35,9 @@ secrets:
 
 volume:
   attachments:
-    existingClaim: "bitwarden-attachments"
+    size: 5Gi
+    labels:
+      backup: "critical"
   licenses:
     enabled: false
   logs:
@@ -56,14 +58,23 @@ database:
   
   volume:
     backups:
-      existingClaim: "bitwarden-mssql-backups"
+      size: 1Gi
       accessMode: ReadWriteOnce
+      storageClass: "longhorn-ssd-replicated"
+      labels:
+        backup: "important"
     data:
-      existingClaim: "bitwarden-mssql-data"
+      size: 10Gi
       accessMode: ReadWriteOnce
+      storageClass: "longhorn-ssd-replicated"
+      labels:
+        backup: "critical"
     log:
-      existingClaim: "bitwarden-mssql-log"
+      size: 10Gi
       accessMode: ReadWriteOnce
+      storageClass: "longhorn-ssd-replicated"
+      labels:
+        backup: "important"
 
 component:
   admin:
