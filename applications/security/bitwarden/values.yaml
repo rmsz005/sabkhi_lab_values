@@ -1,0 +1,146 @@
+---
+general:
+  domain: "bitwarden.internal.rmsz005.com"
+  
+  ingress:
+    enabled: true
+    className: "nginx"
+    tls:
+      name: bitwarden-tls
+      clusterIssuer: letsencrypt-production
+    annotations: {}
+  
+  email:
+    replyToEmail: "bitwarden@internal.rmsz005.com"
+    smtpHost: "REPLACED_VIA_SECRET"
+    smtpPort: "587"
+    smtpSsl: "false"
+    smtpStartTls: "true"
+    smtpTrustServer: "false"
+    smtpSslOverride: "false"
+  
+  disableUserRegistration: "false"
+  enableCloudCommunication: false
+  cloudRegion: "US"
+  
+  labels:
+    app.kubernetes.io/part-of: "bitwarden"
+  
+  volumeAccessMode: "ReadWriteMany"
+
+sharedStorageClassName: "longhorn-ssd-replicated"
+
+secrets:
+  secretName: "bitwarden-secrets"
+
+volume:
+  attachments:
+    existingClaim: "bitwarden-attachments"
+  licenses:
+    enabled: false
+  logs:
+    enabled: false
+  dataprotection:
+    enabled: false
+
+database:
+  enabled: true
+  
+  resources:
+    requests:
+      memory: "2G"
+      cpu: "100m"
+    limits:
+      memory: "2G"
+      cpu: "500m"
+  
+  volume:
+    backups:
+      existingClaim: "bitwarden-mssql-backups"
+      accessMode: ReadWriteOnce
+    data:
+      existingClaim: "bitwarden-mssql-data"
+      accessMode: ReadWriteOnce
+    log:
+      existingClaim: "bitwarden-mssql-log"
+      accessMode: ReadWriteOnce
+
+component:
+  admin:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  api:
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+  
+  attachments:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  events:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  icons:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  identity:
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+  
+  notifications:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  scim:
+    enabled: false
+  
+  sso:
+    enabled: false
+  
+  web:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+
