@@ -1,0 +1,10 @@
+apiVersion: v2
+name: mssql
+description: Microsoft SQL Server for Bitwarden
+type: application
+version: 1.0.0
+
+dependencies:
+  - name: mssql
+    version: 0.5.0
+    repository: https://microsoft.github.io/mssql-server-samples/
