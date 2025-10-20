@@ -55,13 +55,6 @@ spec:
             name: bitwarden-self-host-events
             port:
               number: 5000
-      - path: /scim
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-scim
-            port:
-              number: 5000
       - path: /sso
         pathType: Prefix
         backend:
