@@ -21,7 +21,7 @@ general:
   
   disableUserRegistration: "false"
   enableCloudCommunication: false
-  cloudRegion: "US"
+  cloudRegion: "EU"
   
   labels:
     app.kubernetes.io/part-of: "bitwarden"
@@ -75,6 +75,10 @@ database:
       storageClass: "longhorn-ssd-replicated"
       labels:
         backup: "important"
+
+hooks:
+  preUpgrade:
+    enabled: false
 
 component:
   admin:
