@@ -1,0 +1,8 @@
+apiVersion: v2
+name: mssql-wrapper
+version: 0.1.0
+dependencies:
+- name: mssql
+  version: "1.2.0"
+  repository: "oci://registry.gitlab.com/xrow-public/helm-mssql/charts"
+

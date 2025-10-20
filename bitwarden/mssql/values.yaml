@@ -1,0 +1,38 @@
+---
+global:
+  storageClass: "longhorn-ssd-replicated"
+
+auth:
+  database: bitwarden
+  rootPassword: ""  # Will be overridden by secret
+  username: bitwardenuser
+  password: ""  # Will be overridden by secret
+  existingSecret: mssql-secret
+  rootPasswordKey: rootPassword
+  passwordKey: userPassword
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: "longhorn-ssd-replicated"
+  size: 20Gi
+
+# Resources
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "1000m"
+  limits:
+    memory: "4Gi"
+    cpu: "2000m"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 1433
+
+# MSSQL configuration
+mssql:
+  edition: "Developer"  # Free edition for development
+  acceptEula: true
+
