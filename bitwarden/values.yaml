@@ -1,0 +1,201 @@
+---
+general:
+  # Domain name for Bitwarden
+  domain: "bitwarden.internal.rmsz005.com"
+  
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      nginx.ingress.kubernetes.io/proxy-body-size: "105M"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+      cert-manager.io/cluster-issuer: "letsencrypt"
+      cert-manager.io/common-name: "bitwarden.internal.rmsz005.com"
+    
+    tls:
+      name: bitwarden-tls
+      clusterIssuer: letsencrypt
+    
+    paths:
+      web:
+        path: /(.*)
+        pathType: ImplementationSpecific
+      attachments:
+        path: /attachments/(.*)
+        pathType: ImplementationSpecific
+      api:
+        path: /api/(.*)
+        pathType: ImplementationSpecific
+      icons:
+        path: /icons/(.*)
+        pathType: ImplementationSpecific
+      notifications:
+        path: /notifications/(.*)
+        pathType: ImplementationSpecific
+      events:
+        path: /events/(.*)
+        pathType: ImplementationSpecific
+      scim:
+        path: /scim/(.*)
+        pathType: ImplementationSpecific
+      sso:
+        path: /(sso/.*)
+        pathType: ImplementationSpecific
+      identity:
+        path: /(identity/.*)
+        pathType: ImplementationSpecific
+      admin:
+        path: /(admin/?.*)
+        pathType: ImplementationSpecific
+  
+  # Disable account registration (set email for admin users below)
+  disableUserRegistration: "false"
+  
+  # Comma-separated list of email addresses for Admin users
+  admins: "admin@rmsz005.com"
+  
+  email:
+    replyToEmail: "no-reply@rmsz005.com"
+    smtpHost: "smtp-relay.brevo.com"
+    smtpPort: "587"
+    smtpSsl: "false"  # Using TLS not SSL
+    smtpTrustServer: "false"
+    smtpSslOverride: "false"
+    smtpStartTls: "true"
+  
+  sso:
+    enforceSsoPolicyForAllUsers: false
+  
+  # ReadWriteMany access mode for shared storage
+  volumeAccessMode: "ReadWriteMany"
+  
+  # Enable cloud communication for billing sync
+  enableCloudCommunication: false
+  cloudRegion: EU
+
+# Shared storage class (must support ReadWriteMany)
+sharedStorageClassName: "longhorn"
+
+# Reference to sealed secret
+secrets:
+  secretName: bitwarden-secret
+  secretProviderClass: ""
+
+# Disable built-in database - use external MSSQL
+database:
+  enabled: false
+
+# Component configuration
+component:
+  # Reduce resource requests for smaller cluster
+  admin:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  api:
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+  
+  attachments:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  events:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  icons:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  identity:
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+  
+  notifications:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  scim:
+    enabled: false  # Disable SCIM unless needed
+  
+  sso:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+  
+  web:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
+
+# Volume configuration
+volume:
+  logs:
+    enabled: true
+    size: 1Gi
+    storageClass: "longhorn-ssd-replicated"
+  
+  attachments:
+    enabled: true
+    size: 10Gi
+    storageClass: "longhorn-ssd-replicated"
+  
+  dataprotection:
+    enabled: true
+    size: 1Gi
+    storageClass: "longhorn-ssd-replicated"
+  
+  licenses:
+    enabled: true
+    size: 1Gi
+    storageClass: "longhorn-ssd-replicated"
+
