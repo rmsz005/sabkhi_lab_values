@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bitwarden-tailscale
+  namespace: bitwarden
+  annotations:
+    tailscale.com/tags: "tag:bitwarden"
+spec:
+  ingressClassName: tailscale
+  rules:
+  - host: bitwarden
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bitwarden-self-host-web
+            port:
+              number: 5000
+  tls:
+  - hosts:
+    - bitwarden
+
