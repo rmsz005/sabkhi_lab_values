@@ -4,12 +4,9 @@ global:
 
 auth:
   database: bitwarden
-  rootPassword: ""  # Will be overridden by secret
   username: bitwardenuser
-  password: ""  # Will be overridden by secret
   existingSecret: mssql-secret
-  rootPasswordKey: rootPassword
-  passwordKey: userPassword
+  createDatabase: true
 
 # Persistence
 persistence:
@@ -31,8 +28,6 @@ service:
   type: ClusterIP
   port: 1433
 
-# MSSQL configuration
-mssql:
-  edition: "Developer"  # Free edition for development
-  acceptEula: true
+# MSSQL edition: Developer, Express, Standard, Enterprise, EnterpriseCore
+edition: "Developer"
 
