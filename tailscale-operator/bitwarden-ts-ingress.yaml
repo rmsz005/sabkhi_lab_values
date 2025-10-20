@@ -5,8 +5,7 @@ metadata:
   name: bitwarden-tailscale
   namespace: bitwarden
   annotations:
-    tailscale.com/tags: "tag:k8s"
-    nginx.ingress.kubernetes.io/proxy-body-size: "105M"
+    tailscale.com/tags: "tag:bitwarden"
 spec:
   ingressClassName: tailscale
   rules:
