@@ -4,30 +4,28 @@ global:
 
 auth:
   database: bitwarden
-  username: ""  # Empty = use SA account only
+  username: ""
   existingSecret: mssql-secret
   createDatabase: true
 
-# Persistence
-persistence:
-  enabled: true
-  storageClass: "longhorn-ssd-replicated"
-  size: 20Gi
-
-# Resources - based on VPA recommendations
-resources:
-  requests:
-    memory: "1400Mi"
-    cpu: "50m"
-  limits:
-    memory: "2800Mi"
-    cpu: "500m"
-
-# Service configuration
-service:
-  type: ClusterIP
-  port: 1433
-
-# MSSQL edition: Developer, Express, Standard, Enterprise, EnterpriseCore
 edition: "Developer"
+
+primary:
+  persistence:
+    enabled: true
+    storageClass: "longhorn-ssd-replicated"
+    size: 20Gi
+  
+  resources:
+    requests:
+      memory: "1400Mi"
+      cpu: "50m"
+    limits:
+      memory: "2800Mi"
+      cpu: "500m"
+  
+  service:
+    type: ClusterIP
+    ports:
+      mssql: 1433
 
