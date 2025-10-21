@@ -57,10 +57,10 @@ general:
   disableUserRegistration: "false"
   
   # Comma-separated list of email addresses for Admin users
-  admins: "admin@rmsz005.com"
+  admins: "ramzy.sabkhi@gmail.com"
   
   email:
-    replyToEmail: "no-reply@rmsz005.com"
+    replyToEmail: "no-reply@bitwarden.internal.rmsz005.com"
     smtpHost: "smtp-relay.brevo.com"
     smtpPort: "587"
     smtpSsl: "false"  # Using TLS not SSL
