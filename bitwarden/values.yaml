@@ -60,7 +60,7 @@ general:
   admins: "ramzy.sabkhi@gmail.com"
   
   email:
-    replyToEmail: "ramzy.sabkhi@gmail.com"
+    replyToEmail: "no-reply@rmsz005.com"
     smtpHost: "smtp-relay.brevo.com"
     smtpPort: "587"
     smtpSsl: "false"  # Using TLS not SSL
