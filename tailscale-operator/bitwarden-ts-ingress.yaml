@@ -12,71 +12,14 @@ spec:
   - host: bitwarden
     http:
       paths:
-      # Order matters! Most specific paths first
-      - path: /attachments
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-attachments
-            port:
-              number: 5000
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-api
-            port:
-              number: 5000
-      - path: /icons
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-icons
-            port:
-              number: 5000
-      - path: /notifications
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-notifications
-            port:
-              number: 5000
-      - path: /events
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-events
-            port:
-              number: 5000
-      - path: /identity
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-identity
-            port:
-              number: 5000
-      - path: /admin
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-admin
-            port:
-              number: 5000
-      - path: /sso
-        pathType: Prefix
-        backend:
-          service:
-            name: bitwarden-self-host-sso
-            port:
-              number: 5000
-      # Catch-all must be LAST
+      # Proxy everything to nginx which handles path rewriting
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: bitwarden-self-host-web
+            name: bitwarden-nginx-proxy
             port:
-              number: 5000
+              number: 80
   tls:
   - hosts:
     - bitwarden
