@@ -5,7 +5,7 @@ metadata:
   name: bitwarden-tailscale
   namespace: bitwarden
   annotations:
-    tailscale.com/tags: "tag:bitwarden"
+    tailscale.com/tags: "tag:k8s"
 spec:
   ingressClassName: tailscale
   rules:
