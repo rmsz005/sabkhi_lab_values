@@ -4,7 +4,7 @@ global:
 
 auth:
   database: bitwarden
-  username: bitwardenuser
+  username: ""  # Empty = use SA account only
   existingSecret: mssql-secret
   createDatabase: true
 
