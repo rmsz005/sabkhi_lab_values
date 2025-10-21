@@ -92,68 +92,68 @@ database:
 
 # Component configuration
 component:
-  # Reduce resource requests for smaller cluster
+  # Resource limits based on VPA recommendations (requests=target, limits=2x for headroom)
   admin:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "160Mi"
+        cpu: "20m"
       limits:
-        memory: "128Mi"
+        memory: "320Mi"
         cpu: "100m"
   
   api:
     resources:
       requests:
-        memory: "256Mi"
-        cpu: "200m"
+        memory: "300Mi"
+        cpu: "20m"
       limits:
-        memory: "512Mi"
-        cpu: "500m"
+        memory: "600Mi"
+        cpu: "100m"
   
   attachments:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "100Mi"
+        cpu: "20m"
       limits:
-        memory: "128Mi"
+        memory: "200Mi"
         cpu: "100m"
   
   events:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "125Mi"
+        cpu: "20m"
       limits:
-        memory: "128Mi"
+        memory: "250Mi"
         cpu: "100m"
   
   icons:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "160Mi"
+        cpu: "20m"
       limits:
-        memory: "128Mi"
+        memory: "320Mi"
         cpu: "100m"
   
   identity:
     resources:
       requests:
-        memory: "128Mi"
-        cpu: "100m"
+        memory: "140Mi"
+        cpu: "20m"
       limits:
-        memory: "256Mi"
-        cpu: "200m"
+        memory: "280Mi"
+        cpu: "100m"
   
   notifications:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "160Mi"
+        cpu: "20m"
       limits:
-        memory: "128Mi"
+        memory: "320Mi"
         cpu: "100m"
   
   scim:
@@ -162,19 +162,19 @@ component:
   sso:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "160Mi"
+        cpu: "20m"
       limits:
-        memory: "128Mi"
+        memory: "320Mi"
         cpu: "100m"
   
   web:
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "100Mi"
+        cpu: "20m"
       limits:
-        memory: "128Mi"
+        memory: "200Mi"
         cpu: "100m"
 
 # Volume configuration
