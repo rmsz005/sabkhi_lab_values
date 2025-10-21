@@ -1,5 +1,4 @@
 ---
-# Direct Immich chart configuration - values must be under immich: section
 immich:
   persistence:
     library:
@@ -8,31 +7,21 @@ immich:
 image:
   tag: "v2.0.1"
 
-# Use external PostgreSQL (deprecated subchart)
 postgresql:
   enabled: false
 
-# Override environment variables for external PostgreSQL
 env:
   DB_HOSTNAME: "immich-postgresql"
   DB_USERNAME: "immich"
   DB_DATABASE_NAME: "immich"
-  # Redis Configuration
   REDIS_HOSTNAME: "immich-redis-master"
   REDIS_PORT: "6379"
-  # Production tuning
   NODE_ENV: "production"
-  LOG_LEVEL: "log"  # Options: verbose, debug, log, warn, error
-  # Transcoding optimization
-  # IMMICH_WORKERS_INCLUDE: "api"  # Removed - let single server handle all tasks
-  # IMMICH_WORKERS_EXCLUDE: ""     # Removed - not using worker splitting
-  # Increase transcoding parallelism
-  FFMPEG_THREADS: "0"  # Use all available CPU cores
-  # Enable Immich monitoring/telemetry
-  IMMICH_TELEMETRY_INCLUDE: "all"  # Enable all metrics: api, host, io
-  IMMICH_API_METRICS_PORT: "8081"  # Server metrics endpoint
-  IMMICH_MICROSERVICES_METRICS_PORT: "8082"  # ML/microservices metrics
-  # Load from secrets explicitly
+  LOG_LEVEL: "log"
+  FFMPEG_THREADS: "0"
+  IMMICH_TELEMETRY_INCLUDE: "all"
+  IMMICH_API_METRICS_PORT: "8081"
+  IMMICH_MICROSERVICES_METRICS_PORT: "8082"
   DB_PASSWORD:
     valueFrom:
       secretKeyRef:
@@ -46,8 +35,7 @@ env:
 
 server:
   controller:
-    replicas: 3  # Single Immich server handling all tasks
-  # Expose metrics port for Prometheus scraping
+    replicas: 2
   service:
     main:
       ports:
@@ -77,23 +65,15 @@ server:
           secretName: immich-tls
   resources:
     requests:
-      memory: "2Gi"      # Increased for handling all tasks
-      cpu: "1000m"
+      memory: "1Gi"
+      cpu: "25m"
     limits:
-      memory: "8Gi"      # Full server needs more resources
-      cpu: "4000m"       # Allow CPU bursts for transcoding
+      memory: "2Gi"
+      cpu: "100m"
 
-# Note: The official Immich chart doesn't support separate microservices deployment
-# We need to either:
-# 1. Use single server (remove IMMICH_WORKERS_INCLUDE) for simplicity
-# 2. Create a custom deployment alongside the chart
-# For now, we'll revert to single server handling all tasks
-
-# Scale machine learning for AI workloads
 machine-learning:
   controller:
-    replicas: 3  # Distribute ML processing
-  # Expose metrics port for ML monitoring
+    replicas: 2
   service:
     main:
       ports:
@@ -104,13 +84,12 @@ machine-learning:
           targetPort: 8082
   resources:
     requests:
-      memory: "2Gi"
-      cpu: "1000m"
+      memory: "4Gi"
+      cpu: "20m"
     limits:
-      memory: "8Gi" 
-      cpu: "4000m"
-  
-# Pod anti-affinity to spread different Immich components across nodes
+      memory: "8Gi"
+      cpu: "100m"
+
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
@@ -124,8 +103,6 @@ affinity:
             - immich
         topologyKey: kubernetes.io/hostname
 
-# Removed microservices-specific affinity rules since we're using single server
-
 redis:
   enabled: true
   architecture: standalone
@@ -137,13 +114,11 @@ redis:
     persistence:
       enabled: true
       size: 1Gi
-      storageClass: "longhorn-ssd-replicated"  # Fast storage for cache
+      storageClass: "longhorn-ssd-replicated"
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
+        memory: 100Mi
+        cpu: 110m
       limits:
-        memory: 512Mi
-        cpu: 1000m
-
-# PVC is created by immich-storage ArgoCD application
+        memory: 200Mi
+        cpu: 250m
