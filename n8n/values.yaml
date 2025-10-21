@@ -1,13 +1,9 @@
 ---
-# Minimal N8n Community Charts Configuration for testing
-
-# Image configuration
 image:
   repository: n8nio/n8n
   pullPolicy: IfNotPresent
   tag: "1.107.4"
 
-# Ingress configuration with TLS
 ingress:
   enabled: true
   className: nginx
@@ -24,37 +20,26 @@ ingress:
         - n8n.internal.rmsz005.com
       secretName: n8n-tls
 
-# Database configuration (SQLite default)
 db:
   type: sqlite
 
-# Main node configuration
 main:
-  # Single replica
   count: 1
-  
-  # Basic resources
   resources:
     requests:
-      memory: "512Mi"
-      cpu: "250m"
+      memory: "1100Mi"
+      cpu: "20m"
     limits:
-      memory: "2Gi"
-      cpu: "1000m"
-
-  # Enable persistence
+      memory: "2200Mi"
+      cpu: "100m"
   persistence:
     enabled: true
     mountPath: "/home/node/.n8n"
     storageClass: "longhorn-ssd-replicated"
     accessMode: ReadWriteOnce
     size: 10Gi
-
-  # Environment variables for public URL
   extraEnvVars:
     WEBHOOK_URL: "https://n8n.internal.rmsz005.com/"
     N8N_EDITOR_BASE_URL: "https://n8n.internal.rmsz005.com/"
-
-  # Reference sealed secrets
   extraSecretNamesForEnvFrom:
     - n8n-encryption-secret
