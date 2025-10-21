@@ -70,13 +70,14 @@ grafana:
   # Admin credentials (change these!)
   adminPassword: "admin123"  # CHANGE THIS AFTER FIRST LOGIN
   
+  # Resource allocation
   resources:
     requests:
-      memory: 200Mi
-      cpu: 15m
+      memory: 512Mi
+      cpu: 200m
     limits:
-      memory: 400Mi
-      cpu: 50m
+      memory: 1Gi
+      cpu: 500m
 
 # AlertManager configuration
 alertmanager:

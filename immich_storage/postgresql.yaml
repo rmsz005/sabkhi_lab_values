@@ -16,14 +16,14 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 999
+        runAsUser: 999  # postgres user
         fsGroup: 999
       containers:
       - name: postgresql
         image: tensorchord/pgvecto-rs:pg15-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
+          readOnlyRootFilesystem: false  # PostgreSQL needs write access
           capabilities:
             drop:
             - ALL
@@ -41,20 +41,21 @@ spec:
         - name: POSTGRES_DB
           value: immich
         - name: PGDATA
-          value: "/var/lib/postgresql/data/pgdata"
+          value: "/var/lib/postgresql/data/pgdata"  # Use subdirectory to avoid lost+found issues
+        # PostgreSQL Performance Tuning
         - name: POSTGRES_INITDB_ARGS
           value: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
         - name: POSTGRES_HOST_AUTH_METHOD
-          value: "md5"
+          value: "md5"  # Require password authentication
         ports:
         - containerPort: 5432
         resources:
           requests:
-            memory: "1100Mi"
-            cpu: "25m"
+            memory: "512Mi"
+            cpu: "250m"
           limits:
-            memory: "2200Mi"
-            cpu: "100m"
+            memory: "2Gi"
+            cpu: "3000m"
         livenessProbe:
           exec:
             command:
@@ -119,6 +120,7 @@ data:
     CREATE EXTENSION IF NOT EXISTS earthdistance;
     CREATE EXTENSION IF NOT EXISTS vectors;
 ---
+# PostgreSQL Performance Configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -126,19 +128,30 @@ metadata:
   namespace: immich
 data:
   postgresql.conf: |
-    shared_buffers = 256MB
-    effective_cache_size = 1GB
-    work_mem = 16MB
-    maintenance_work_mem = 64MB
+    # Memory Configuration (optimized for photo management)
+    shared_buffers = 256MB                    # 25% of available memory
+    effective_cache_size = 1GB                # Estimate of total memory available
+    work_mem = 16MB                          # Memory for sorts/hashes
+    maintenance_work_mem = 64MB              # Memory for maintenance operations
+    
+    # Connection Configuration
     max_connections = 100
+    
+    # WAL Configuration (for better write performance)
     wal_buffers = 16MB
     checkpoint_completion_target = 0.9
-    random_page_cost = 1.1
-    effective_io_concurrency = 200
+    
+    # Query Performance
+    random_page_cost = 1.1                   # Assuming SSD/NVMe storage
+    effective_io_concurrency = 200           # For SSD/NVMe
+    
+    # Logging (important for troubleshooting)
     log_destination = 'stderr'
     logging_collector = on
-    log_min_duration_statement = 1000
+    log_min_duration_statement = 1000        # Log queries taking > 1s
     log_line_prefix = '%t [%p-%l] %q%u@%d '
+    
+    # Performance monitoring
     shared_preload_libraries = 'pg_stat_statements'
     track_activity_query_size = 2048
     pg_stat_statements.track = all
