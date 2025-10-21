@@ -60,7 +60,7 @@ general:
   admins: "ramzy.sabkhi@gmail.com"
   
   email:
-    replyToEmail: "no-reply@bitwarden.internal.rmsz005.com"
+    replyToEmail: "ramzy.sabkhi@gmail.com"
     smtpHost: "smtp-relay.brevo.com"
     smtpPort: "587"
     smtpSsl: "false"  # Using TLS not SSL
