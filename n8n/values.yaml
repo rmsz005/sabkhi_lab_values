@@ -31,7 +31,7 @@ main:
       cpu: "20m"
     limits:
       memory: "2200Mi"
-      cpu: "100m"
+      cpu: "500m"
   persistence:
     enabled: true
     mountPath: "/home/node/.n8n"
