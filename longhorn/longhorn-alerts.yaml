@@ -1,0 +1,120 @@
+---
+# Longhorn Prometheus Alerts - Critical monitoring for backup system
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: longhorn-alerts
+  namespace: monitoring
+  labels:
+    prometheus: monitoring-kube-prometheus-prometheus
+    role: alert-rules
+spec:
+  groups:
+    - name: longhorn
+      interval: 30s
+      rules:
+        # Backup failures
+        - alert: LonghornBackupFailed
+          expr: |
+            increase(longhorn_backup_state{state="error"}[1h]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Longhorn backup failed for {{ $labels.volume }}"
+            description: "Volume {{ $labels.volume }} backup failed. Check Longhorn UI and logs."
+        
+        - alert: LonghornBackupStuck
+          expr: |
+            time() - longhorn_backup_timestamp > 86400
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "Longhorn backup not running for {{ $labels.volume }}"
+            description: "No successful backup in 24h for volume {{ $labels.volume }}."
+        
+        # Volume health
+        - alert: LonghornVolumeNotHealthy
+          expr: |
+            longhorn_volume_robustness != 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Longhorn volume {{ $labels.volume }} degraded"
+            description: "Volume {{ $labels.volume }} is not healthy. Check replica status."
+        
+        - alert: LonghornVolumeReplicaDegraded
+          expr: |
+            longhorn_volume_replica_count < 2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Longhorn volume {{ $labels.volume }} has < 2 replicas"
+            description: "Volume {{ $labels.volume }} running with {{ $value }} replica(s). Risk of data loss."
+        
+        # Storage capacity
+        - alert: LonghornStorageUsageHigh
+          expr: |
+            (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.85
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Longhorn storage >85% on {{ $labels.node }}"
+            description: "Node {{ $labels.node }} storage at {{ $value | humanizePercentage }}. Clean up or expand."
+        
+        - alert: LonghornStorageUsageCritical
+          expr: |
+            (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.95
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Longhorn storage >95% on {{ $labels.node }}"
+            description: "Node {{ $labels.node }} storage at {{ $value | humanizePercentage }}. URGENT: Expand or clean up NOW."
+        
+        # Snapshot issues
+        - alert: LonghornSnapshotFailed
+          expr: |
+            increase(longhorn_snapshot_state{state="error"}[1h]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Longhorn snapshot failed for {{ $labels.volume }}"
+            description: "Volume {{ $labels.volume }} snapshot failed. Check Longhorn logs."
+        
+        # Manager/Engine issues
+        - alert: LonghornManagerDown
+          expr: |
+            up{job="longhorn-manager"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Longhorn manager down on {{ $labels.instance }}"
+            description: "Longhorn manager pod not responding. Check pod status."
+        
+        - alert: LonghornEngineDown
+          expr: |
+            longhorn_volume_state{state="detached"} == 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Longhorn volume {{ $labels.volume }} detached"
+            description: "Volume {{ $labels.volume }} engine is detached. Volume may be unmounted."
+        
+        # Recurring job issues
+        - alert: LonghornRecurringJobNotExecuting
+          expr: |
+            increase(longhorn_recurring_job_execution_count[25h]) == 0
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "Longhorn recurring job {{ $labels.job }} not executing"
+            description: "Job {{ $labels.job }} hasn't run in 24h. Check job configuration."

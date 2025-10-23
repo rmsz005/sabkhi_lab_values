@@ -42,6 +42,11 @@ metadata:
   labels:
     app: spotizerr
     component: cache
+  annotations:
+    # TEST: Verify PVC annotations propagate to Longhorn volume
+    # This is cache data - safe to test
+    recurring-job.longhorn.io/source: enabled
+    recurring-job-group.longhorn.io/optional: enabled
 spec:
   accessModes:
     - ReadWriteOnce
