@@ -51,10 +51,10 @@ velero:
         credential:
           name: "velero-r2-credentials"
           key: "cloud"
-        config:
-          region: "auto"
-          s3ForcePathStyle: "true"
-          s3Url: "https://52766c8f49fc559c1835b3c2e5259e3b.r2.cloudflarestorage.com"
+      config:
+        region: "auto"
+        s3ForcePathStyle: "true"
+        s3Url: "https://afa5dcb799daa610271ec08ad1630524.eu.r2.cloudflarestorage.com"
     
     # Volume snapshot location (disabled)
     volumeSnapshotLocation: []
