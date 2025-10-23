@@ -95,6 +95,9 @@ persistence:
     accessMode: ReadWriteOnce
     size: 5Gi
     retain: true
+    annotations:
+      recurring-job.longhorn.io/source: enabled
+      recurring-job-group.longhorn.io/important: enabled
   
   # Music library volume - shared with Spotizerr via music-library PVC
   music:

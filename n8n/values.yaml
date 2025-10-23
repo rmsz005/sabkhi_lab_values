@@ -49,6 +49,9 @@ main:
     storageClass: "longhorn-ssd-replicated"
     accessMode: ReadWriteOnce
     size: 10Gi
+    annotations:
+      recurring-job.longhorn.io/source: enabled
+      recurring-job-group.longhorn.io/important: enabled
 
   # Environment variables for public URL
   extraEnvVars:
