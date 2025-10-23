@@ -99,8 +99,8 @@ live:
 api:
   replicas: 1
   memoryLimit: 400Mi
-  cpuLimit: 500m
-  cpuRequest: 50m
+  cpuLimit: 1200m
+  cpuRequest: 500m
   memoryRequest: 200Mi
   image: artifacts.plane.so/makeplane/plane-backend
   pullPolicy: Always
