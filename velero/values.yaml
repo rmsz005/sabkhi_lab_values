@@ -3,124 +3,112 @@
 # Chart: vmware-tanzu/velero v11.1.1 (Velero 1.17.0)
 # Purpose: Kubernetes resource backup to Cloudflare R2 (NOT volume data - Longhorn handles that)
 
-# Image configuration
-image:
-  repository: velero/velero
-  tag: v1.17.0
-  pullPolicy: IfNotPresent
-
-# Init containers
-initContainers:
-  - name: velero-plugin-for-aws
-    image: velero/velero-plugin-for-aws:v1.11.0
-    volumeMounts:
-      - mountPath: /target
-        name: plugins
-
-# Resources
-resources:
-  requests:
-    cpu: 200m
-    memory: 256Mi
-  limits:
-    cpu: 500m
-    memory: 512Mi
-
-# Credentials from existing secret (to be created as sealed secret)
-credentials:
-  useSecret: true
-  existingSecret: velero-r2-credentials
-  secretContents:
-    cloud: |
-      [default]
-      aws_access_key_id=${AWS_ACCESS_KEY_ID}
-      aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
-
-# Configuration
-configuration:
-  # Don't backup volume data - Longhorn does this
-  defaultVolumesToFsBackup: false
-  defaultSnapshotMoveData: false
-  
-  # Default backup TTL
-  defaultBackupTTL: 720h  # 30 days
-  
-  # Provider name
-  provider: aws
-  
-  # Backup storage location settings
-  backupStorageLocation:
-    name: default
-    provider: aws
-    bucket: sabkhi-lab-backups
-    prefix: velero  # Separate prefix from Longhorn backups
-    default: true
-    config:
-      region: auto
-      s3ForcePathStyle: "true"
-      s3Url: "https://52766c8f49fc559c1835b3c2e5259e3b.r2.cloudflarestorage.com"
-
-# Disable snapshots (Longhorn handles volume backups)
-snapshotsEnabled: false
-
-# Don't deploy node agent (no volume snapshots needed)
-deployNodeAgent: false
-
-# AWS provider configuration
-providers:
-  - name: aws
-
-# Pod annotations for metrics scraping
-podAnnotations:
-  prometheus.io/scrape: "true"
-  prometheus.io/port: "8085"
-  prometheus.io/path: "/metrics"
-
-# Backup schedules
-schedules:
-  # Daily backup of all application namespaces
-  daily-cluster-backup:
-    disabled: false
-    schedule: "0 3 * * *"  # 3 AM daily (after Longhorn critical backups at 2 AM)
-    useOwnerReferencesInBackup: false
-    template:
-      ttl: 720h  # 30 days retention
-      includedNamespaces:
-        - "*"
-      excludedNamespaces:
-        - kube-system
-        - argocd
-      includeClusterResources: true
-      storageLocation: default
-
-# Metrics for Prometheus
-metrics:
-  enabled: true
-  scrapeInterval: 30s
-  scrapeTimeout: 10s
-  serviceMonitor:
-    enabled: true
-    additionalLabels:
-      prometheus: monitoring-kube-prometheus-prometheus
-
-# Install kubectl in Velero pod (for restore hooks)
-kubectl:
+velero:
+  # Image configuration
   image:
-    repository: docker.io/bitnami/kubectl
-    tag: 1.31
+    repository: velero/velero
+    tag: v1.17.0
+    pullPolicy: IfNotPresent
 
-# Cleanup
-cleanUpCRDs: false  # Don't delete CRDs on uninstall
+  # Init containers
+  initContainers:
+    - name: velero-plugin-for-aws
+      image: velero/velero-plugin-for-aws:v1.11.0
+      volumeMounts:
+        - mountPath: /target
+          name: plugins
 
-# Node selector (optional - run on specific nodes if needed)
-nodeSelector: {}
+  # Resources
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
 
-# Tolerations
-tolerations: []
+  # Credentials from existing secret (managed by sealed-secrets)
+  credentials:
+    useSecret: true
+    existingSecret: velero-r2-credentials
 
-# Service account
-serviceAccount:
-  server:
-    create: true
-    name: velero
+  # Configuration
+  configuration:
+    # Don't backup volume data - Longhorn does this
+    defaultVolumesToFsBackup: false
+    defaultSnapshotMoveData: false
+    
+    # Default backup TTL
+    defaultBackupTTL: 720h  # 30 days
+    
+    # Backup storage location settings
+    backupStorageLocation:
+      - name: "default"
+        provider: "aws"
+        bucket: "sabkhi-lab-backups"
+        prefix: "velero"
+        default: true
+        credential:
+          name: "velero-r2-credentials"
+          key: "cloud"
+        config:
+          region: "auto"
+          s3ForcePathStyle: "true"
+          s3Url: "https://52766c8f49fc559c1835b3c2e5259e3b.r2.cloudflarestorage.com"
+    
+    # Volume snapshot location (disabled)
+    volumeSnapshotLocation: []
 
+  # Disable snapshots (Longhorn handles volume backups)
+  snapshotsEnabled: false
+
+  # Don't deploy node agent (no volume snapshots needed)
+  deployNodeAgent: false
+
+  # Pod annotations for metrics scraping
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8085"
+    prometheus.io/path: "/metrics"
+
+  # Backup schedules
+  schedules:
+    # Daily backup of all application namespaces
+    daily-cluster-backup:
+      disabled: false
+      schedule: "0 3 * * *"  # 3 AM daily (after Longhorn critical backups at 2 AM)
+      useOwnerReferencesInBackup: false
+      template:
+        ttl: 720h  # 30 days retention
+        includedNamespaces:
+          - "*"
+        excludedNamespaces:
+          - kube-system
+          - argocd
+        includeClusterResources: true
+        storageLocation: default
+
+  # Metrics for Prometheus
+  metrics:
+    enabled: true
+    scrapeInterval: 30s
+    scrapeTimeout: 10s
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        prometheus: monitoring-kube-prometheus-prometheus
+
+  # Cleanup
+  cleanUpCRDs: false  # Don't delete CRDs on uninstall
+
+  # Node selector (optional - run on specific nodes if needed)
+  nodeSelector: {}
+
+  # Tolerations
+  tolerations: []
+
+  # Service account
+  serviceAccount:
+    server:
+      create: true
+      name: velero
