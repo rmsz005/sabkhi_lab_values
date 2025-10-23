@@ -30,39 +30,51 @@ resources:
 credentials:
   useSecret: true
   existingSecret: velero-r2-credentials
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=${AWS_ACCESS_KEY_ID}
+      aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
 
 # Configuration
 configuration:
-  # Backup storage location
-  backupStorageLocation:
-    - name: default
-      provider: aws
-      bucket: sabkhi-lab-backups
-      prefix: velero  # Separate prefix from Longhorn backups
-      default: true
-      config:
-        region: auto
-        s3ForcePathStyle: "true"
-        s3Url: ""  # Will be set via AWS_ENDPOINTS in secret
-  
-  # Volume snapshot location (disabled - Longhorn handles volume backups)
-  volumeSnapshotLocation:
-    - name: default
-      provider: aws
-      config:
-        region: auto
-  
   # Don't backup volume data - Longhorn does this
   defaultVolumesToFsBackup: false
   defaultSnapshotMoveData: false
   
-  # Excluded namespaces (GitOps-managed, rebuilt from Git)
-  excludedNamespaces:
-    - kube-system
-    - argocd
-  
   # Default backup TTL
   defaultBackupTTL: 720h  # 30 days
+  
+  # Provider name
+  provider: aws
+  
+  # Backup storage location settings
+  backupStorageLocation:
+    name: default
+    provider: aws
+    bucket: sabkhi-lab-backups
+    prefix: velero  # Separate prefix from Longhorn backups
+    default: true
+    config:
+      region: auto
+      s3ForcePathStyle: "true"
+      s3Url: "https://52766c8f49fc559c1835b3c2e5259e3b.r2.cloudflarestorage.com"
+
+# Disable snapshots (Longhorn handles volume backups)
+snapshotsEnabled: false
+
+# Don't deploy node agent (no volume snapshots needed)
+deployNodeAgent: false
+
+# AWS provider configuration
+providers:
+  - name: aws
+
+# Pod annotations for metrics scraping
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8085"
+  prometheus.io/path: "/metrics"
 
 # Backup schedules
 schedules:
@@ -70,6 +82,7 @@ schedules:
   daily-cluster-backup:
     disabled: false
     schedule: "0 3 * * *"  # 3 AM daily (after Longhorn critical backups at 2 AM)
+    useOwnerReferencesInBackup: false
     template:
       ttl: 720h  # 30 days retention
       includedNamespaces:
