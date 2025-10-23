@@ -60,7 +60,7 @@ web:
   replicas: 1
   memoryLimit: 200Mi
   cpuLimit: 800m
-  cpuRequest: 50m
+  cpuRequest: 250m
   memoryRequest: 100Mi
   image: artifacts.plane.so/makeplane/plane-frontend
   pullPolicy: Always
@@ -70,7 +70,7 @@ space:
   replicas: 1
   memoryLimit: 200Mi
   cpuLimit: 800m
-  cpuRequest: 50m
+  cpuRequest: 250m
   memoryRequest: 100Mi
   image: artifacts.plane.so/makeplane/plane-space
   pullPolicy: Always
@@ -80,7 +80,7 @@ admin:
   replicas: 1
   memoryLimit: 200Mi
   cpuLimit: 800m
-  cpuRequest: 50m
+  cpuRequest: 250m
   memoryRequest: 100Mi
   image: artifacts.plane.so/makeplane/plane-admin
   pullPolicy: Always
@@ -89,8 +89,8 @@ admin:
 live:
   replicas: 1
   memoryLimit: 640Mi
-  cpuLimit: 500m
-  cpuRequest: 50m
+  cpuLimit: 800m
+  cpuRequest: 250m
   memoryRequest: 320Mi
   image: artifacts.plane.so/makeplane/plane-live
   pullPolicy: Always
@@ -100,7 +100,7 @@ api:
   replicas: 1
   memoryLimit: 400Mi
   cpuLimit: 1200m
-  cpuRequest: 500m
+  cpuRequest: 800m
   memoryRequest: 200Mi
   image: artifacts.plane.so/makeplane/plane-backend
   pullPolicy: Always
@@ -110,7 +110,7 @@ worker:
   replicas: 1
   memoryLimit: 1700Mi
   cpuLimit: 800m
-  cpuRequest: 50m
+  cpuRequest: 250m
   memoryRequest: 850Mi
   image: artifacts.plane.so/makeplane/plane-backend
   pullPolicy: Always
@@ -119,7 +119,7 @@ beatworker:
   replicas: 1
   memoryLimit: 400Mi
   cpuLimit: 500m
-  cpuRequest: 50m
+  cpuRequest: 250m
   memoryRequest: 200Mi
   image: artifacts.plane.so/makeplane/plane-backend
   pullPolicy: Always

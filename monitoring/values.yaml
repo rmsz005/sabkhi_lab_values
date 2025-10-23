@@ -2,7 +2,7 @@
 # Prometheus configuration
 prometheus:
   prometheusSpec:
-    scrapeInterval: 5s
+    scrapeInterval: 30s
     evaluationInterval: 1m  # How often to evaluate alerting rules
     
     # Data retention
