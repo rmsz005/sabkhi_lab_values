@@ -13,6 +13,9 @@ metadata:
   annotations:
     # Prevent accidental deletion
     argocd.argoproj.io/sync-options: Prune=false
+    # Longhorn backup (currently labeled critical, but could be optional if music is re-downloadable)
+    recurring-job.longhorn.io/source: enabled
+    recurring-job-group.longhorn.io/critical: enabled
 spec:
   accessModes:
     - ReadWriteMany  # RWX allows both Spotizerr and Navidrome to mount simultaneously

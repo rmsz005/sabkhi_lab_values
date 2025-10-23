@@ -5,6 +5,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: immich-library-pvc
   namespace: immich
+  annotations:
+    recurring-job.longhorn.io/source: enabled
+    recurring-job-group.longhorn.io/critical: enabled
 spec:
   accessModes:
     - ReadWriteMany
@@ -19,6 +22,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: immich-postgresql-pvc
   namespace: immich
+  annotations:
+    recurring-job.longhorn.io/source: enabled
+    recurring-job-group.longhorn.io/critical: enabled
 spec:
   accessModes:
     - ReadWriteOnce
