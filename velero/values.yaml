@@ -1,0 +1,113 @@
+---
+# Velero Configuration for sabkhi_lab
+# Chart: vmware-tanzu/velero v11.1.1 (Velero 1.17.0)
+# Purpose: Kubernetes resource backup to Cloudflare R2 (NOT volume data - Longhorn handles that)
+
+# Image configuration
+image:
+  repository: velero/velero
+  tag: v1.17.0
+  pullPolicy: IfNotPresent
+
+# Init containers
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.11.0
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+# Resources
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Credentials from existing secret (to be created as sealed secret)
+credentials:
+  useSecret: true
+  existingSecret: velero-r2-credentials
+
+# Configuration
+configuration:
+  # Backup storage location
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: sabkhi-lab-backups
+      prefix: velero  # Separate prefix from Longhorn backups
+      default: true
+      config:
+        region: auto
+        s3ForcePathStyle: "true"
+        s3Url: ""  # Will be set via AWS_ENDPOINTS in secret
+  
+  # Volume snapshot location (disabled - Longhorn handles volume backups)
+  volumeSnapshotLocation:
+    - name: default
+      provider: aws
+      config:
+        region: auto
+  
+  # Don't backup volume data - Longhorn does this
+  defaultVolumesToFsBackup: false
+  defaultSnapshotMoveData: false
+  
+  # Excluded namespaces (GitOps-managed, rebuilt from Git)
+  excludedNamespaces:
+    - kube-system
+    - argocd
+  
+  # Default backup TTL
+  defaultBackupTTL: 720h  # 30 days
+
+# Backup schedules
+schedules:
+  # Daily backup of all application namespaces
+  daily-cluster-backup:
+    disabled: false
+    schedule: "0 3 * * *"  # 3 AM daily (after Longhorn critical backups at 2 AM)
+    template:
+      ttl: 720h  # 30 days retention
+      includedNamespaces:
+        - "*"
+      excludedNamespaces:
+        - kube-system
+        - argocd
+      includeClusterResources: true
+      storageLocation: default
+
+# Metrics for Prometheus
+metrics:
+  enabled: true
+  scrapeInterval: 30s
+  scrapeTimeout: 10s
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      prometheus: monitoring-kube-prometheus-prometheus
+
+# Install kubectl in Velero pod (for restore hooks)
+kubectl:
+  image:
+    repository: docker.io/bitnami/kubectl
+    tag: 1.31
+
+# Cleanup
+cleanUpCRDs: false  # Don't delete CRDs on uninstall
+
+# Node selector (optional - run on specific nodes if needed)
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Service account
+serviceAccount:
+  server:
+    create: true
+    name: velero
+
