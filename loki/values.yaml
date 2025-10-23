@@ -61,9 +61,6 @@ singleBinary:
     enabled: true
     size: 50Gi
     storageClass: "longhorn-nvme-replicated"  # Fast storage for logs
-    annotations:
-      recurring-job.longhorn.io/source: enabled
-      recurring-job-group.longhorn.io/important: enabled
   
   # Expose metrics for Prometheus
   extraPorts:

@@ -12,10 +12,6 @@ prometheus:
     # Storage configuration with NVMe and replication
     storageSpec:
       volumeClaimTemplate:
-        metadata:
-          annotations:
-            recurring-job.longhorn.io/source: enabled
-            recurring-job-group.longhorn.io/important: enabled
         spec:
           accessModes: ["ReadWriteOnce"]
           storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
@@ -95,10 +91,6 @@ alertmanager:
     # Storage for alerts
     storage:
       volumeClaimTemplate:
-        metadata:
-          annotations:
-            recurring-job.longhorn.io/source: enabled
-            recurring-job-group.longhorn.io/important: enabled
         spec:
           accessModes: ["ReadWriteOnce"]
           storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
