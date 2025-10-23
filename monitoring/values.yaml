@@ -2,6 +2,9 @@
 # Prometheus configuration
 prometheus:
   prometheusSpec:
+    scrapeInterval: 5s
+    evaluationInterval: 1m  # How often to evaluate alerting rules
+    
     # Data retention
     retention: 14d
     retentionSize: 18GB  # Leave some headroom in 20GB volume
