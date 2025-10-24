@@ -28,7 +28,7 @@ redis:
 
 postgres:
   local_setup: true
-  image: postgres:15.7-alpine
+  image: postgres:15.14-alpine
   servicePort: 5432
   storageClass: "longhorn-ssd-replicated"
   volumeSize: 5Gi
