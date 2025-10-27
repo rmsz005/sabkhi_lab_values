@@ -6,6 +6,8 @@ metadata:
     {{- include "spotizerr.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "spotizerr.selectorLabels" . | nindent 6 }}
@@ -43,9 +45,6 @@ spec:
           done
           echo "Redis is ready!"
         resources:
-          limits:
-            cpu: 100m
-            memory: 64Mi
           requests:
             cpu: 10m
             memory: 32Mi

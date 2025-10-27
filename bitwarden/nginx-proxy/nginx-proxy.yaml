@@ -128,9 +128,6 @@ spec:
           requests:
             cpu: 20m
             memory: 100Mi
-          limits:
-            cpu: 100m
-            memory: 200Mi
       volumes:
       - name: nginx-config
         configMap:

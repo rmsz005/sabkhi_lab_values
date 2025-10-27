@@ -32,6 +32,10 @@ prometheus:
 
 # Grafana configuration  
 grafana:
+  # Deployment strategy for RWO volume
+  deploymentStrategy:
+    type: Recreate
+  
   # Enable persistence for dashboards/settings
   persistence:
     enabled: true
