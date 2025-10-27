@@ -33,6 +33,10 @@ main:
   # Single replica
   count: 1
   
+  # Deployment strategy for RWO volume
+  deploymentStrategy:
+    type: Recreate
+  
   # Basic resources
   resources:
     requests:
