@@ -92,69 +92,47 @@ database:
 
 # Component configuration
 component:
-  # Resource limits based on VPA recommendations (requests=target, limits=2x for headroom)
   admin:
     resources:
       requests:
         memory: "160Mi"
         cpu: "20m"
-      limits:
-        memory: "320Mi"
-        cpu: "100m"
   
   api:
     resources:
       requests:
         memory: "300Mi"
         cpu: "20m"
-      limits:
-        memory: "600Mi"
-        cpu: "100m"
   
   attachments:
     resources:
       requests:
         memory: "100Mi"
         cpu: "20m"
-      limits:
-        memory: "200Mi"
-        cpu: "100m"
   
   events:
     resources:
       requests:
         memory: "125Mi"
         cpu: "20m"
-      limits:
-        memory: "250Mi"
-        cpu: "100m"
   
   icons:
     resources:
       requests:
         memory: "160Mi"
         cpu: "20m"
-      limits:
-        memory: "320Mi"
-        cpu: "100m"
   
   identity:
     resources:
       requests:
         memory: "140Mi"
         cpu: "20m"
-      limits:
-        memory: "280Mi"
-        cpu: "100m"
   
   notifications:
     resources:
       requests:
         memory: "160Mi"
         cpu: "20m"
-      limits:
-        memory: "320Mi"
-        cpu: "100m"
   
   scim:
     enabled: false  # Disable SCIM unless needed
@@ -164,18 +142,12 @@ component:
       requests:
         memory: "160Mi"
         cpu: "20m"
-      limits:
-        memory: "320Mi"
-        cpu: "100m"
   
   web:
     resources:
       requests:
         memory: "100Mi"
         cpu: "20m"
-      limits:
-        memory: "200Mi"
-        cpu: "100m"
 
 # Volume configuration
 volume:

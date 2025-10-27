@@ -45,13 +45,10 @@ nodeSets:
       - name: elasticsearch
         resources:
           requests:
-            memory: 2Gi
-            cpu: 500m
-          limits:
-            memory: 4Gi
-            cpu: 2
+            memory: 2500Mi
+            cpu: 100m
         env:
         # Set JVM heap size (should be ~50% of container memory)
         - name: ES_JAVA_OPTS
-          value: "-Xms1g -Xmx1g"
+          value: "-Xms1250m -Xmx1250m"
 

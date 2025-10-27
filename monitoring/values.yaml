@@ -22,11 +22,8 @@ prometheus:
     # Resource allocation
     resources:
       requests:
-        memory: 2Gi
-        cpu: 500m
-      limits:
-        memory: 4Gi
-        cpu: 2000m
+        memory: 2200Mi
+        cpu: 600m
     
     # Enable service monitors for auto-discovery
     serviceMonitorSelectorNilUsesHelmValues: false
@@ -79,11 +76,8 @@ grafana:
   # Resource allocation
   resources:
     requests:
-      memory: 512Mi
-      cpu: 200m
-    limits:
-      memory: 1Gi
-      cpu: 500m
+      memory: 256Mi
+      cpu: 50m
 
 # AlertManager configuration
 alertmanager:
@@ -101,11 +95,8 @@ alertmanager:
     # Resource allocation
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 200m
+        memory: 128Mi
+        cpu: 10m
 
 # Node Exporter (hardware metrics)
 nodeExporter:

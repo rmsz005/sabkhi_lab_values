@@ -65,11 +65,8 @@ server:
           secretName: immich-tls
   resources:
     requests:
-      memory: "2Gi"
-      cpu: "1000m"
-    limits:
-      memory: "8Gi"
-      cpu: "4000m"
+      memory: "1200Mi"
+      cpu: "200m"
 
 machine-learning:
   controller:
@@ -84,11 +81,8 @@ machine-learning:
           targetPort: 8082
   resources:
     requests:
-      memory: "2Gi"
-      cpu: "1000m"
-    limits:
-      memory: "8Gi"
-      cpu: "4000m"
+      memory: "1000Mi"
+      cpu: "50m"
 
 affinity:
   podAntiAffinity:
@@ -117,8 +111,5 @@ redis:
       storageClass: "longhorn-ssd-replicated"
     resources:
       requests:
-        memory: 100Mi
+        memory: 64Mi
         cpu: 110m
-      limits:
-        memory: 200Mi
-        cpu: 250m

@@ -4,8 +4,17 @@ controller:
   image:
     tag: v0.15.2
   logLevel: info
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+
 speaker:
   enabled: true
   image:
     tag: v0.15.2
   logLevel: info
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi

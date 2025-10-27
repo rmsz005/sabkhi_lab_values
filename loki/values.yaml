@@ -50,11 +50,8 @@ singleBinary:
   # Resource allocation
   resources:
     requests:
-      memory: "1Gi"
-      cpu: "500m"
-    limits:
-      memory: "2Gi"
-      cpu: "1000m"
+      memory: "1200Mi"
+      cpu: "200m"
   
   # Persistence for logs storage
   persistence:

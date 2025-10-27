@@ -26,10 +26,7 @@ recommender:
   resources:
     requests:
       cpu: 50m
-      memory: 500Mi
-    limits:
-      cpu: 200m
-      memory: 1Gi
+      memory: 256Mi
   
   podSecurityContext:
     runAsNonRoot: true
