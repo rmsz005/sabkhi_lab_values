@@ -45,9 +45,6 @@ spec:
           done
           echo "Redis is ready!"
         resources:
-          limits:
-            cpu: 100m
-            memory: 64Mi
           requests:
             cpu: 10m
             memory: 32Mi
