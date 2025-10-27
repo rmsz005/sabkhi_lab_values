@@ -21,11 +21,8 @@ velero:
   # Resources
   resources:
     requests:
-      cpu: 200m
+      cpu: 25m
       memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
 
   # Credentials from existing secret (managed by sealed-secrets)
   credentials:

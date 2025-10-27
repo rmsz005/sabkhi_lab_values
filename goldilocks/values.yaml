@@ -19,11 +19,8 @@ controller:
   
   resources:
     requests:
-      cpu: 25m
-      memory: 256Mi
-    limits:
-      cpu: 100m
-      memory: 512Mi
+      cpu: 10m
+      memory: 128Mi
   
   rbac:
     create: true
@@ -49,11 +46,8 @@ dashboard:
   
   resources:
     requests:
-      cpu: 25m
-      memory: 256Mi
-    limits:
-      cpu: 100m
-      memory: 512Mi
+      cpu: 10m
+      memory: 128Mi
   
   rbac:
     create: true

@@ -16,12 +16,9 @@ spotizerr:
   
   # Resource configuration
   resources:
-    limits:
-      cpu: 2000m
-      memory: 3Gi
     requests:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 200m
+      memory: 700Mi
   
   # Service configuration
   service:
@@ -130,12 +127,9 @@ redis:
   # password: "changeme"  # Only used if existingSecret is not set
   
   resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
     requests:
-      cpu: 250m
-      memory: 256Mi
+      cpu: 10m
+      memory: 64Mi
   
   service:
     type: ClusterIP

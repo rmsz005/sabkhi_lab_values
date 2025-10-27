@@ -80,14 +80,11 @@ config:
 daemonset:
   enabled: true
 
-# Resource allocation  
+# Resource allocation
 resources:
   requests:
     memory: "128Mi"
-    cpu: "100m"
-  limits:
-    memory: "256Mi"
-    cpu: "200m"
+    cpu: "50m"
 
 # Mount additional paths for log collection (using defaultVolumes instead)
 extraVolumes: []

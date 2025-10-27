@@ -42,15 +42,12 @@ podTemplate:
     - name: kibana
       resources:
         requests:
-          memory: 1Gi
-          cpu: 500m
-        limits:
-          memory: 2Gi
-          cpu: 2
+          memory: 1000Mi
+          cpu: 50m
       env:
       # Kibana configuration can also be set via environment variables
       - name: NODE_OPTIONS
-        value: "--max-old-space-size=1536"
+        value: "--max-old-space-size=768"
 
 # Ingress configuration for external access
 ingress:
