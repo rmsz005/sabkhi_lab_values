@@ -97,42 +97,49 @@ component:
       requests:
         memory: "160Mi"
         cpu: "20m"
+      limits: {}
   
   api:
     resources:
       requests:
         memory: "300Mi"
         cpu: "20m"
+      limits: {}
   
   attachments:
     resources:
       requests:
         memory: "100Mi"
         cpu: "20m"
+      limits: {}
   
   events:
     resources:
       requests:
         memory: "125Mi"
         cpu: "20m"
+      limits: {}
   
   icons:
     resources:
       requests:
         memory: "160Mi"
         cpu: "20m"
+      limits: {}
   
   identity:
     resources:
       requests:
         memory: "140Mi"
         cpu: "20m"
+      limits: {}
   
   notifications:
     resources:
       requests:
         memory: "160Mi"
         cpu: "20m"
+      limits: {}
   
   scim:
     enabled: false  # Disable SCIM unless needed
@@ -142,12 +149,14 @@ component:
       requests:
         memory: "160Mi"
         cpu: "20m"
+      limits: {}
   
   web:
     resources:
       requests:
         memory: "100Mi"
         cpu: "20m"
+      limits: {}
 
 # Volume configuration
 volume:
