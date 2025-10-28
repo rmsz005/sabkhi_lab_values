@@ -93,7 +93,6 @@ machine-learning:
       nvidia.com/gpu: "1"
   nodeSelector:
     gpu: nvidia
-  runtimeClassName: nvidia
   env:
     MACHINE_LEARNING_DEVICE: "cuda"
   affinity:
