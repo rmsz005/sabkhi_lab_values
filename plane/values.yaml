@@ -58,8 +58,8 @@ minio:
 
 web:
   replicas: 1
-  memoryLimit: 200Mi
-  cpuLimit: 800m
+  memoryLimit: 4Gi
+  cpuLimit: 8000m
   cpuRequest: 250m
   memoryRequest: 100Mi
   image: artifacts.plane.so/makeplane/plane-frontend
@@ -68,8 +68,8 @@ web:
 
 space:
   replicas: 1
-  memoryLimit: 200Mi
-  cpuLimit: 800m
+  memoryLimit: 4Gi
+  cpuLimit: 8000m
   cpuRequest: 250m
   memoryRequest: 100Mi
   image: artifacts.plane.so/makeplane/plane-space
@@ -78,8 +78,8 @@ space:
 
 admin:
   replicas: 1
-  memoryLimit: 200Mi
-  cpuLimit: 800m
+  memoryLimit: 4Gi
+  cpuLimit: 8000m
   cpuRequest: 250m
   memoryRequest: 100Mi
   image: artifacts.plane.so/makeplane/plane-admin
@@ -88,8 +88,8 @@ admin:
 
 live:
   replicas: 1
-  memoryLimit: 640Mi
-  cpuLimit: 800m
+  memoryLimit: 8Gi
+  cpuLimit: 8000m
   cpuRequest: 250m
   memoryRequest: 320Mi
   image: artifacts.plane.so/makeplane/plane-live
@@ -98,8 +98,8 @@ live:
 
 api:
   replicas: 1
-  memoryLimit: 400Mi
-  cpuLimit: 1200m
+  memoryLimit: 8Gi
+  cpuLimit: 16000m
   cpuRequest: 800m
   memoryRequest: 200Mi
   image: artifacts.plane.so/makeplane/plane-backend
@@ -108,8 +108,8 @@ api:
 
 worker:
   replicas: 1
-  memoryLimit: 1700Mi
-  cpuLimit: 800m
+  memoryLimit: 16Gi
+  cpuLimit: 8000m
   cpuRequest: 250m
   memoryRequest: 850Mi
   image: artifacts.plane.so/makeplane/plane-backend
@@ -117,8 +117,8 @@ worker:
 
 beatworker:
   replicas: 1
-  memoryLimit: 400Mi
-  cpuLimit: 500m
+  memoryLimit: 4Gi
+  cpuLimit: 8000m
   cpuRequest: 250m
   memoryRequest: 200Mi
   image: artifacts.plane.so/makeplane/plane-backend
