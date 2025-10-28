@@ -1,0 +1,37 @@
+---
+# NVIDIA Device Plugin - Exposes nvidia.com/gpu resources to Kubernetes
+# Deployed via ArgoCD - Only runs on nodes with label: gpu=nvidia
+
+nvidia-device-plugin:
+  # Node selector - only deploy on GPU-enabled nodes
+  nodeSelector:
+    gpu: nvidia
+
+  # Resource limits for the device plugin itself
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+
+  # Runtime configuration
+  runtimeClassName: ""
+  
+  # Compatibility settings
+  compatWithCPUManager: false
+  
+  # MIG (Multi-Instance GPU) strategy - not used for Quadro K620
+  migStrategy: none
+  
+  # Device list strategy
+  deviceListStrategy: envvar
+  
+  # Fail on init error - ensures we know if GPU detection fails
+  failOnInitError: true
+  
+  # Update strategy
+  updateStrategy:
+    type: RollingUpdate
+
