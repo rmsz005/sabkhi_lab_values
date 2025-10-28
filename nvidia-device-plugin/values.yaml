@@ -22,6 +22,9 @@ nvidia-device-plugin:
   # Device list strategy - use volume-mounts to discover GPUs via nvidia-container-toolkit
   deviceListStrategy: "volume-mounts"
   
+  # Runtime class name - matches containerd nvidia runtime
+  runtimeClassName: "nvidia"
+  
   # Update strategy
   updateStrategy:
     type: RollingUpdate
