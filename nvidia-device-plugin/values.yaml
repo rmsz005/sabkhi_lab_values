@@ -19,6 +19,9 @@ nvidia-device-plugin:
   # MIG (Multi-Instance GPU) strategy - not used for Quadro K620
   migStrategy: none
   
+  # Device list strategy - use volume-mounts to discover GPUs via nvidia-container-toolkit
+  deviceListStrategy: "volume-mounts"
+  
   # Update strategy
   updateStrategy:
     type: RollingUpdate
