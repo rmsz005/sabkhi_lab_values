@@ -34,7 +34,7 @@ main:
   count: 1
   
   # Deployment strategy for RWO volume
-  deploymentStrategy:
+  strategy:
     type: Recreate
   
   # Basic resources
