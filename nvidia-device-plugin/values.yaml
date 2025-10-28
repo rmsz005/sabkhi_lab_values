@@ -16,20 +16,8 @@ nvidia-device-plugin:
       cpu: 100m
       memory: 100Mi
 
-  # Runtime configuration
-  runtimeClassName: ""
-  
-  # Compatibility settings
-  compatWithCPUManager: false
-  
   # MIG (Multi-Instance GPU) strategy - not used for Quadro K620
   migStrategy: none
-  
-  # Device list strategy
-  deviceListStrategy: envvar
-  
-  # Fail on init error - ensures we know if GPU detection fails
-  failOnInitError: true
   
   # Update strategy
   updateStrategy:
