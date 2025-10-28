@@ -67,6 +67,11 @@ server:
     requests:
       memory: "1200Mi"
       cpu: "200m"
+  nodeSelector:
+    gpu: nvidia
+  env:
+    IMMICH_MEDIA_FFMPEG_ACCEL: "nvenc"
+    IMMICH_MEDIA_FFMPEG_ACCEL_DECODE: "cuda"
 
 machine-learning:
   controller:
@@ -83,19 +88,30 @@ machine-learning:
     requests:
       memory: "1000Mi"
       cpu: "50m"
-
-affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
-      podAffinityTerm:
-        labelSelector:
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - immich
-        topologyKey: kubernetes.io/hostname
+      nvidia.com/gpu: "1"
+    limits:
+      nvidia.com/gpu: "1"
+  nodeSelector:
+    gpu: nvidia
+  runtimeClassName: nvidia
+  env:
+    MACHINE_LEARNING_DEVICE: "cuda"
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - immich
+            - key: app.kubernetes.io/component
+              operator: In
+              values:
+              - machine-learning
+          topologyKey: kubernetes.io/hostname
 
 redis:
   enabled: true
