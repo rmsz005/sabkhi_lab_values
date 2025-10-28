@@ -19,6 +19,7 @@ spotizerr:
     requests:
       cpu: 200m
       memory: 700Mi
+    limits: {}  # Explicitly remove limits (chart defaults to 1000m CPU / 1Gi memory)
   
   # Service configuration
   service:
