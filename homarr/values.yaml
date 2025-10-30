@@ -1,12 +1,9 @@
 homarr:
-  # Database configuration - SQLite with PVC
   database:
     type: sqlite
     migrationEnabled: true
 
-  # Persistence configuration
   persistence:
-    # Configuration data (boards, settings, etc.)
     homarrConfig:
       enabled: true
       storageClassName: longhorn-nvme-replicated
@@ -16,7 +13,6 @@ homarr:
         recurring-job.longhorn.io/source: enabled
         recurring-job-group.longhorn.io/critical: enabled
 
-    # Database persistence (SQLite)
     homarrDatabase:
       enabled: true
       storageClassName: longhorn-nvme-replicated
@@ -26,28 +22,22 @@ homarr:
         recurring-job.longhorn.io/source: enabled
         recurring-job-group.longhorn.io/critical: enabled
 
-    # Icons cache
     homarrIcons:
       enabled: true
       storageClassName: longhorn-nvme-replicated
       accessMode: ReadWriteOnce
       size: 1Gi
 
-  # Resource limits (will adjust after Goldilocks recommendations)
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
 
-  # Environment variables
   env:
     TZ: "Europe/Paris"
-    # Authentication settings
     AUTH_PROVIDER: "credentials"
-    # NextAuth configuration
     NEXTAUTH_URL: "https://homarr.internal.rmsz005.com"
 
-  # Service configuration
   service:
     enabled: true
     type: ClusterIP
@@ -57,32 +47,38 @@ homarr:
         targetPort: http
         protocol: TCP
 
-  # Ingress disabled (we'll create separate manifests)
   ingress:
-    enabled: false
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - host: homarr.internal.rmsz005.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - homarr.internal.rmsz005.com
+        secretName: homarr-tls
 
-  # HTTPRoute disabled
   httproute:
     enabled: false
 
-  # RBAC disabled (not needed for basic usage)
   rbac:
     enabled: false
 
-  # Security context (container-level)
   securityContext:
-    runAsNonRoot: false  # Homarr needs to write to volumes
+    runAsNonRoot: false
     runAsUser: 0
     runAsGroup: 0
 
-  # Pod security context (pod-level)
   podSecurityContext:
     fsGroup: 0
 
-  # Deployment strategy - use Recreate for ReadWriteOnce volumes
   strategyType: Recreate
 
-  # Probes
   readinessProbe:
     httpGet:
       path: /api/health/ready
