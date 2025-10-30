@@ -37,7 +37,6 @@ homarr:
     TZ: "Europe/Paris"
     AUTH_PROVIDER: "credentials"
     NEXTAUTH_URL: "https://homarr.internal.rmsz005.com"
-    ENABLE_KUBERNETES: "true"
 
   service:
     enabled: true
