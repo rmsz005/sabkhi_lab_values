@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-web-clusterip
+  namespace: plane
+  labels:
+    app.name: plane-plane-web
+spec:
+  type: ClusterIP
+  selector:
+    app.name: plane-plane-web
+  ports:
+  - name: web
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+
