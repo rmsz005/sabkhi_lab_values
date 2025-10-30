@@ -1,0 +1,84 @@
+uptime-kuma:
+  image:
+    repository: louislam/uptime-kuma
+    tag: "1.23.16-debian"
+    pullPolicy: IfNotPresent
+
+  useDeploy: true
+
+  service:
+    type: ClusterIP
+    port: 3001
+
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/server-snippets: |
+        location / {
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_http_version 1.1;
+          proxy_set_header X-Forwarded-Host $http_host;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-For $remote_addr;
+          proxy_set_header Host $host;
+          proxy_set_header Connection "upgrade";
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_cache_bypass $http_upgrade;
+        }
+    hosts:
+      - host: uptime-kuma.internal.rmsz005.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: uptime-kuma-tls
+        hosts:
+          - uptime-kuma.internal.rmsz005.com
+
+  volume:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 4Gi
+    storageClassName: longhorn-nvme-replicated
+    existingClaim: uptime-kuma-pvc
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 180
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+    exec:
+      command:
+        - "extra/healthcheck"
+
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    failureThreshold: 3
+    httpGet:
+      path: /
+      port: 3001
+      scheme: HTTP
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+

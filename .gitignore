@@ -85,4 +85,5 @@ values-local.yml
 
 # Generated manifests
 manifests/
-rendered/ 
+rendered/ uptime-kuma/charts/
+uptime-kuma/Chart.lock
