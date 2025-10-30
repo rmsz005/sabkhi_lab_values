@@ -1,0 +1,108 @@
+homarr:
+  # Database configuration - SQLite with PVC
+  database:
+    type: sqlite
+    migrationEnabled: true
+
+  # Persistence configuration
+  persistence:
+    # Configuration data (boards, settings, etc.)
+    homarrConfig:
+      enabled: true
+      storageClassName: longhorn-nvme-replicated
+      accessMode: ReadWriteOnce
+      size: 2Gi
+      annotations:
+        recurring-job.longhorn.io/source: enabled
+        recurring-job-group.longhorn.io/critical: enabled
+
+    # Database persistence (SQLite)
+    homarrDatabase:
+      enabled: true
+      storageClassName: longhorn-nvme-replicated
+      accessMode: ReadWriteOnce
+      size: 1Gi
+      annotations:
+        recurring-job.longhorn.io/source: enabled
+        recurring-job-group.longhorn.io/critical: enabled
+
+    # Icons cache
+    homarrIcons:
+      enabled: true
+      storageClassName: longhorn-nvme-replicated
+      accessMode: ReadWriteOnce
+      size: 1Gi
+
+  # Resource limits (will adjust after Goldilocks recommendations)
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Environment variables
+  env:
+    TZ: "America/New_York"
+    # Authentication settings
+    AUTH_PROVIDER: "credentials"
+    # Disable telemetry if desired
+    NEXTAUTH_URL: "https://homarr.internal.rmsz005.com"
+
+  # Service configuration
+  service:
+    enabled: true
+    type: ClusterIP
+    ports:
+      app:
+        port: 7575
+        targetPort: http
+        protocol: TCP
+
+  # Ingress disabled (we'll create separate manifests)
+  ingress:
+    enabled: false
+
+  # HTTPRoute disabled
+  httproute:
+    enabled: false
+
+  # RBAC disabled (not needed for basic usage)
+  rbac:
+    enabled: false
+
+  # Security context
+  securityContext:
+    runAsNonRoot: false  # Homarr needs to write to volumes
+    runAsUser: 0
+    runAsGroup: 0
+    fsGroup: 0
+
+  # Pod security context
+  podSecurityContext:
+    fsGroup: 0
+
+  # Deployment strategy - use Recreate for ReadWriteOnce volumes
+  strategyType: Recreate
+
+  # Probes
+  readinessProbe:
+    httpGet:
+      path: /api/health/ready
+      port: 7575
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+  livenessProbe:
+    httpGet:
+      path: /api/health/ready
+      port: 7575
+    initialDelaySeconds: 60
+    periodSeconds: 30
+
+  # Node selection (optional - adjust if needed)
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
