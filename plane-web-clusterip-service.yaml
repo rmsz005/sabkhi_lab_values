@@ -15,4 +15,89 @@ spec:
     port: 3000
     targetPort: 3000
     protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-api-clusterip
+  namespace: plane
+  labels:
+    app.name: plane-plane-api
+spec:
+  type: ClusterIP
+  selector:
+    app.name: plane-plane-api
+  ports:
+  - name: api
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-live-clusterip
+  namespace: plane
+  labels:
+    app.name: plane-plane-live
+spec:
+  type: ClusterIP
+  selector:
+    app.name: plane-plane-live
+  ports:
+  - name: live
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-space-clusterip
+  namespace: plane
+  labels:
+    app.name: plane-plane-space
+spec:
+  type: ClusterIP
+  selector:
+    app.name: plane-plane-space
+  ports:
+  - name: space
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-admin-clusterip
+  namespace: plane
+  labels:
+    app.name: plane-plane-admin
+spec:
+  type: ClusterIP
+  selector:
+    app.name: plane-plane-admin
+  ports:
+  - name: admin
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plane-minio-clusterip
+  namespace: plane
+  labels:
+    app.name: plane-plane-minio
+spec:
+  type: ClusterIP
+  selector:
+    app.name: plane-plane-minio
+  ports:
+  - name: minio
+    port: 9000
+    targetPort: 9000
+    protocol: TCP
 

@@ -12,6 +12,48 @@ spec:
   - host: plane
     http:
       paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: plane-api-clusterip
+            port:
+              number: 8000
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: plane-api-clusterip
+            port:
+              number: 8000
+      - path: /live/
+        pathType: Prefix
+        backend:
+          service:
+            name: plane-live-clusterip
+            port:
+              number: 3000
+      - path: /spaces
+        pathType: Prefix
+        backend:
+          service:
+            name: plane-space-clusterip
+            port:
+              number: 3000
+      - path: /god-mode
+        pathType: Prefix
+        backend:
+          service:
+            name: plane-admin-clusterip
+            port:
+              number: 3000
+      - path: /uploads
+        pathType: Prefix
+        backend:
+          service:
+            name: plane-minio-clusterip
+            port:
+              number: 9000
       - path: /
         pathType: Prefix
         backend:
