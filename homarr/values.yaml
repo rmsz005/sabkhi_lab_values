@@ -47,8 +47,13 @@ homarr:
     TZ: "America/New_York"
     # Authentication settings
     AUTH_PROVIDER: "credentials"
-    # Disable telemetry if desired
+    # NextAuth configuration
     NEXTAUTH_URL: "https://homarr.internal.rmsz005.com"
+    NEXTAUTH_SECRET:
+      valueFrom:
+        secretKeyRef:
+          name: db-encryption
+          key: nextauth-secret
 
   # Service configuration
   service:
