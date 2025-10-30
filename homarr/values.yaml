@@ -72,14 +72,13 @@ homarr:
   rbac:
     enabled: false
 
-  # Security context
+  # Security context (container-level)
   securityContext:
     runAsNonRoot: false  # Homarr needs to write to volumes
     runAsUser: 0
     runAsGroup: 0
-    fsGroup: 0
 
-  # Pod security context
+  # Pod security context (pod-level)
   podSecurityContext:
     fsGroup: 0
 
