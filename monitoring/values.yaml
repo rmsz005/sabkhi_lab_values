@@ -6,8 +6,8 @@ prometheus:
     evaluationInterval: 1m  # How often to evaluate alerting rules
     
     # Data retention
-    retention: 14d
-    retentionSize: 18GB  # Leave some headroom in 20GB volume
+    retention: 42d
+    retentionSize: 54GB  #
     
     # Storage configuration with NVMe and replication
     storageSpec:
@@ -17,7 +17,7 @@ prometheus:
           storageClassName: "longhorn-nvme-replicated"  # NVMe with 2 replicas
           resources:
             requests:
-              storage: 20Gi
+              storage: 60Gi
     
     # Resource allocation
     resources:
@@ -76,6 +76,10 @@ grafana:
   
   # Admin credentials (change these!)
   adminPassword: "admin123"  # CHANGE THIS AFTER FIRST LOGIN
+  
+  # Environment variables
+  env:
+    GF_SECURITY_ALLOW_EMBEDDING: "true"
   
   # Resource allocation
   resources:
