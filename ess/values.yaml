@@ -3,7 +3,7 @@
 # Cluster: sabkhi_lab
 # Federation: DISABLED (private mode)
 
-# Matrix server name (used in user IDs: @username:matrix.internal.rmsz005.com)
+# Matrix server name (REQUIRED - used in user IDs: @username:matrix.internal.rmsz005.com)
 serverName: matrix.internal.rmsz005.com
 
 # Cert-manager configuration for Let's Encrypt
@@ -22,7 +22,7 @@ ingress:
 synapse:
   enabled: true
   
-  # Hostname configuration
+  # Hostname (REQUIRED)
   ingress:
     host: matrix.internal.rmsz005.com
   
@@ -58,7 +58,7 @@ synapse:
 matrixAuthenticationService:
   enabled: true
   
-  # Hostname configuration
+  # Hostname (REQUIRED)
   ingress:
     host: account.internal.rmsz005.com
   
@@ -91,9 +91,23 @@ matrixAuthenticationService:
 elementWeb:
   enabled: true
   
-  # Hostname configuration
+  # Hostname (REQUIRED)
   ingress:
     host: chat.internal.rmsz005.com
+  
+  # Resource allocation
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "10m"
+
+# Element Admin - Admin interface
+elementAdmin:
+  enabled: true
+  
+  # Hostname (REQUIRED)
+  ingress:
+    host: admin.internal.rmsz005.com
   
   # Resource allocation
   resources:
@@ -105,7 +119,7 @@ elementWeb:
 matrixRTC:
   enabled: true
   
-  # Hostname configuration
+  # Hostname (REQUIRED)
   ingress:
     host: mrtc.internal.rmsz005.com
   
@@ -134,17 +148,3 @@ postgres:
 # Auto-generate secrets (signing keys, etc.)
 initSecrets:
   enabled: true
-
-# Element Admin - Admin interface
-elementAdmin:
-  enabled: true
-  
-  # Hostname configuration
-  ingress:
-    host: admin.internal.rmsz005.com
-  
-  # Resource allocation
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "10m"
