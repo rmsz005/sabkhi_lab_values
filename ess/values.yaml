@@ -83,9 +83,8 @@ matrix-stack:
           email:
             from: "matrix@rmsz005.com"
             reply_to: "no-reply@rmsz005.com"
-            mode: smtp
+            mode: starttls
             smtp:
-              mode: starttls
               hostname: smtp-relay.brevo.com
               port: 587
               username:
@@ -147,8 +146,18 @@ matrix-stack:
       storageClassName: longhorn-nvme-replicated
       resourcePolicy: keep
 
-  # HAProxy - Internal load balancer  
-  # Using chart defaults - custom config causes FD limit issues
+  # HAProxy - Internal load balancer
+  haproxy:
+    # Reduce maxconn to fit within system FD limits (65535)
+    # Default maxconn 40000 requires ~80K FDs which exceeds limit
+    replicas: 2
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "128Mi"
+        cpu: "200m"
 
   # Auto-generate secrets (signing keys, etc.)
   initSecrets:
