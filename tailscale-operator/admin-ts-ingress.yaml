@@ -5,7 +5,7 @@ metadata:
   name: admin-tailscale
   namespace: ess
   annotations:
-    tailscale.com/tags: "tag:matrix"
+    tailscale.com/tags: "tag:k8s"
 spec:
   ingressClassName: tailscale
   rules:

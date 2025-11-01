@@ -134,8 +134,16 @@ matrix-stack:
       resourcePolicy: keep
 
   # HAProxy - Internal load balancer
+  # NOTE: HAProxy requires manual ConfigMap patch due to FD (file descriptor) limits
+  # The chart sets maxconn=40000 which requires ~80k FDs, but system limit is 65535
+  # After deployment, run:
+  #   kubectl get configmap -n ess ess-haproxy -o yaml | \
+  #     sed 's/maxconn 40000/maxconn 8000/g' | \
+  #     sed 's/fullconn 20000/fullconn 4000/g' | \
+  #     sed 's/maxconn 20000/maxconn 4000/g' | \
+  #     kubectl apply -f -
+  #   kubectl rollout restart deployment -n ess ess-haproxy
   haproxy:
-    # Keep replicas at 1, minimal resources to reduce FD requirements
     replicas: 1
     resources:
       requests:
