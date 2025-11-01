@@ -83,8 +83,9 @@ matrix-stack:
           email:
             from: "matrix@rmsz005.com"
             reply_to: "no-reply@rmsz005.com"
-            mode: starttls
+            transport: smtp
             smtp:
+              mode: starttls
               hostname: smtp-relay.brevo.com
               port: 587
               username:
@@ -148,16 +149,15 @@ matrix-stack:
 
   # HAProxy - Internal load balancer
   haproxy:
-    # Reduce maxconn to fit within system FD limits (65535)
-    # Default maxconn 40000 requires ~80K FDs which exceeds limit
-    replicas: 2
+    # Keep replicas at 1, minimal resources to reduce FD requirements
+    replicas: 1
     resources:
       requests:
-        memory: "64Mi"
-        cpu: "50m"
+        memory: "32Mi"
+        cpu: "10m"
       limits:
-        memory: "128Mi"
-        cpu: "200m"
+        memory: "64Mi"
+        cpu: "100m"
 
   # Auto-generate secrets (signing keys, etc.)
   initSecrets:
