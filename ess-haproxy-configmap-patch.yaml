@@ -1,0 +1,80 @@
+---
+# HAProxy ConfigMap Patch - Reduces maxconn to fit within system FD limits
+# This patches the chart-generated ConfigMap to reduce maxconn from 40000 to 8000
+# Reason: HAProxy calculates FD requirements as ~2x maxconn, exceeding system limit of 65535
+#
+# This manifest is applied AFTER the Helm chart by ArgoCD as a plain manifest
+# Reference: sabkhi_lab_values/ess/values.yaml haproxy section
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ess-haproxy
+  namespace: ess
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    app.kubernetes.io/component: haproxy
+    app.kubernetes.io/instance: ess
+    app.kubernetes.io/name: haproxy
+    app.kubernetes.io/part-of: matrix-stack
+data:
+  haproxy.cfg: |
+    global
+      maxconn 8000
+      log stdout format raw local0 info
+      stats socket /var/run/api.sock user haproxy group haproxy mode 660 level admin expose-fd listeners
+      stats timeout 30s
+      user haproxy
+      group haproxy
+      daemon
+
+    defaults
+      log     global
+      mode    http
+      option  httplog
+      option  dontlognull
+      timeout connect 5000
+      timeout client  50000
+      timeout server  50000
+      maxconn 4000
+
+    frontend stats
+      mode http
+      bind *:8405
+      stats enable
+      stats uri /
+      stats refresh 10s
+
+    frontend synapse-main-federation
+      mode tcp
+      bind *:8448
+      default_backend synapse-main-federation
+
+    backend synapse-main-federation
+      mode tcp
+      balance roundrobin
+      option tcp-check
+      server synapse-main ess-synapse-main:8048 check inter 10s fall 2 rise 3
+
+    frontend synapse-main-client
+      mode tcp
+      bind *:8008
+      default_backend synapse-main-client
+
+    backend synapse-main-client
+      mode tcp
+      balance roundrobin
+      option tcp-check
+      server synapse-main ess-synapse-main:8008 check inter 10s fall 2 rise 3
+
+    frontend synapse-generic-worker-client
+      mode tcp
+      bind *:8081
+      default_backend synapse-generic-worker-client
+
+    backend synapse-generic-worker-client
+      mode tcp
+      balance roundrobin
+      option tcp-check
+      server synapse-main ess-synapse-main:8008 check inter 10s fall 2 rise 3
+
