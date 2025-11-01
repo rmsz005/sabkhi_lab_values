@@ -41,6 +41,9 @@ matrix-stack:
       requests:
         memory: "1024Mi"
         cpu: "500m"
+      limits:
+        memory: "2048Mi"
+        cpu: "1000m"
     
     # Custom Synapse configuration (homeserver.yaml additions)
     additional:
@@ -69,6 +72,9 @@ matrix-stack:
       requests:
         memory: "256Mi"
         cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
     
     # Custom MAS configuration (config.yaml additions)
     additional:
@@ -77,7 +83,7 @@ matrix-stack:
           email:
             from: "matrix@rmsz005.com"
             reply_to: "no-reply@rmsz005.com"
-            transport: smtp
+            mode: smtp
             smtp:
               mode: starttls
               hostname: smtp-relay.brevo.com
@@ -102,6 +108,9 @@ matrix-stack:
       requests:
         memory: "64Mi"
         cpu: "10m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
 
   # Element Admin - Admin interface
   elementAdmin:
@@ -116,6 +125,9 @@ matrix-stack:
       requests:
         memory: "64Mi"
         cpu: "10m"
+      limits:
+        memory: "128Mi"
+        cpu: "100m"
 
   # Matrix RTC (VOIP/TURN)
   matrixRTC:
@@ -124,12 +136,6 @@ matrix-stack:
     # Hostname (REQUIRED)
     ingress:
       host: mrtc.internal.rmsz005.com
-    
-    # Resource allocation
-    resources:
-      requests:
-        memory: "256Mi"
-        cpu: "100m"
 
   # PostgreSQL (chart-managed)
   postgres:
@@ -146,6 +152,19 @@ matrix-stack:
       requests:
         memory: "512Mi"
         cpu: "200m"
+      limits:
+        memory: "1024Mi"
+        cpu: "1000m"
+
+  # HAProxy - Internal load balancer
+  haproxy:
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "50m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"
 
   # Auto-generate secrets (signing keys, etc.)
   initSecrets:
