@@ -100,13 +100,17 @@ matrix-stack:
     
     # Custom Element Web configuration (config.json overrides)
     # Using Tailscale URLs so it works from external browsers
+    # Note: Must be valid JSON (chart merges into config.json)
     additional:
-      0-tailscale:
-        config:
-          default_server_config:
-            m.homeserver:
-              base_url: "https://matrix.taild37df5.ts.net"
-              server_name: "matrix.internal.rmsz005.com"
+      0-tailscale: |
+        {
+          "default_server_config": {
+            "m.homeserver": {
+              "base_url": "https://matrix.taild37df5.ts.net",
+              "server_name": "matrix.internal.rmsz005.com"
+            }
+          }
+        }
 
   # Element Admin - Admin interface
   elementAdmin:
