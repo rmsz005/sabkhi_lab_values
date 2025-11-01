@@ -3,148 +3,150 @@
 # Cluster: sabkhi_lab
 # Federation: DISABLED (private mode)
 
-# Matrix server name (REQUIRED - used in user IDs: @username:matrix.internal.rmsz005.com)
-serverName: matrix.internal.rmsz005.com
+# ALL VALUES MUST BE NESTED UNDER matrix-stack since it's a dependency
+matrix-stack:
+  # Matrix server name (REQUIRED - used in user IDs: @username:matrix.internal.rmsz005.com)
+  serverName: matrix.internal.rmsz005.com
 
-# Cert-manager configuration for Let's Encrypt
-certManager:
-  clusterIssuer: letsencrypt
+  # Cert-manager configuration for Let's Encrypt
+  certManager:
+    clusterIssuer: letsencrypt
 
-# Global ingress configuration
-ingress:
-  className: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-
-# Synapse - Matrix homeserver
-synapse:
-  enabled: true
-  
-  # Hostname (REQUIRED)
+  # Global ingress configuration
   ingress:
-    host: matrix.internal.rmsz005.com
-  
-  # Media storage
-  media:
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+  # Synapse - Matrix homeserver
+  synapse:
+    enabled: true
+    
+    # Hostname (REQUIRED)
+    ingress:
+      host: matrix.internal.rmsz005.com
+    
+    # Media storage
+    media:
+      storage:
+        size: 10Gi
+        storageClassName: longhorn-nvme-replicated
+        resourcePolicy: keep
+      maxUploadSize: 100M
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: "1024Mi"
+        cpu: "500m"
+    
+    # Custom Synapse configuration (homeserver.yaml additions)
+    additional:
+      0-custom:
+        config: |
+          # Disable federation
+          federation_domain_whitelist: []
+          
+          # Disable registration
+          enable_registration: false
+          
+          # Presence settings
+          presence:
+            enabled: true
+
+  # Matrix Authentication Service
+  matrixAuthenticationService:
+    enabled: true
+    
+    # Hostname (REQUIRED)
+    ingress:
+      host: account.internal.rmsz005.com
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+    
+    # Custom MAS configuration (config.yaml additions)
+    additional:
+      0-email:
+        config: |
+          email:
+            from: "matrix@rmsz005.com"
+            reply_to: "no-reply@rmsz005.com"
+            transport: smtp
+            smtp:
+              mode: starttls
+              hostname: smtp-relay.brevo.com
+              port: 587
+              username:
+                secret: ess-smtp-secret
+                key: username
+              password:
+                secret: ess-smtp-secret
+                key: password
+
+  # Element Web - Matrix client
+  elementWeb:
+    enabled: true
+    
+    # Hostname (REQUIRED)
+    ingress:
+      host: chat.internal.rmsz005.com
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "10m"
+
+  # Element Admin - Admin interface
+  elementAdmin:
+    enabled: true
+    
+    # Hostname (REQUIRED)
+    ingress:
+      host: admin.internal.rmsz005.com
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "10m"
+
+  # Matrix RTC (VOIP/TURN)
+  matrixRTC:
+    enabled: true
+    
+    # Hostname (REQUIRED)
+    ingress:
+      host: mrtc.internal.rmsz005.com
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+
+  # PostgreSQL (chart-managed)
+  postgres:
+    enabled: true
+    
+    # Storage configuration
     storage:
-      size: 10Gi
+      size: 5Gi
       storageClassName: longhorn-nvme-replicated
       resourcePolicy: keep
-    maxUploadSize: 100M
-  
-  # Resource allocation
-  resources:
-    requests:
-      memory: "1024Mi"
-      cpu: "500m"
-  
-  # Custom Synapse configuration (homeserver.yaml additions)
-  additional:
-    0-custom:
-      config: |
-        # Disable federation
-        federation_domain_whitelist: []
-        
-        # Disable registration
-        enable_registration: false
-        
-        # Presence settings
-        presence:
-          enabled: true
+    
+    # Resource allocation
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "200m"
 
-# Matrix Authentication Service
-matrixAuthenticationService:
-  enabled: true
-  
-  # Hostname (REQUIRED)
-  ingress:
-    host: account.internal.rmsz005.com
-  
-  # Resource allocation
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-  
-  # Custom MAS configuration (config.yaml additions)
-  additional:
-    0-email:
-      config: |
-        email:
-          from: "matrix@rmsz005.com"
-          reply_to: "no-reply@rmsz005.com"
-          transport: smtp
-          smtp:
-            mode: starttls
-            hostname: smtp-relay.brevo.com
-            port: 587
-            username:
-              secret: ess-smtp-secret
-              key: username
-            password:
-              secret: ess-smtp-secret
-              key: password
-
-# Element Web - Matrix client
-elementWeb:
-  enabled: true
-  
-  # Hostname (REQUIRED)
-  ingress:
-    host: chat.internal.rmsz005.com
-  
-  # Resource allocation
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "10m"
-
-# Element Admin - Admin interface
-elementAdmin:
-  enabled: true
-  
-  # Hostname (REQUIRED)
-  ingress:
-    host: admin.internal.rmsz005.com
-  
-  # Resource allocation
-  resources:
-    requests:
-      memory: "64Mi"
-      cpu: "10m"
-
-# Matrix RTC (VOIP/TURN)
-matrixRTC:
-  enabled: true
-  
-  # Hostname (REQUIRED)
-  ingress:
-    host: mrtc.internal.rmsz005.com
-  
-  # Resource allocation
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-
-# PostgreSQL (chart-managed)
-postgres:
-  enabled: true
-  
-  # Storage configuration
-  storage:
-    size: 5Gi
-    storageClassName: longhorn-nvme-replicated
-    resourcePolicy: keep
-  
-  # Resource allocation
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "200m"
-
-# Auto-generate secrets (signing keys, etc.)
-initSecrets:
-  enabled: true
+  # Auto-generate secrets (signing keys, etc.)
+  initSecrets:
+    enabled: true
