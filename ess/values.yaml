@@ -97,20 +97,6 @@ matrix-stack:
       limits:
         memory: "128Mi"
         cpu: "100m"
-    
-    # Custom Element Web configuration (config.json overrides)
-    # Using Tailscale URLs so it works from external browsers
-    # Note: Must be valid JSON (chart merges into config.json)
-    additional:
-      0-tailscale: |
-        {
-          "default_server_config": {
-            "m.homeserver": {
-              "base_url": "https://matrix.taild37df5.ts.net",
-              "server_name": "matrix.internal.rmsz005.com"
-            }
-          }
-        }
 
   # Element Admin - Admin interface
   elementAdmin:
@@ -148,10 +134,15 @@ matrix-stack:
       resourcePolicy: keep
 
   # HAProxy - Internal load balancer
-  # NOTE: HAProxy FD (file descriptor) limits managed by GitOps
+  # NOTE: HAProxy requires manual ConfigMap patch due to FD (file descriptor) limits
   # The chart sets maxconn=40000 which requires ~80k FDs, but system limit is 65535
-  # Solution: ess-haproxy-configmap-patch.yaml applies a patched ConfigMap with maxconn=8000
-  # This patch is managed by ArgoCD app 'ess-haproxy-patch' (sync wave 1, applies after Helm)
+  # After deployment, run:
+  #   kubectl get configmap -n ess ess-haproxy -o yaml | \
+  #     sed 's/maxconn 40000/maxconn 8000/g' | \
+  #     sed 's/fullconn 20000/fullconn 4000/g' | \
+  #     sed 's/maxconn 20000/maxconn 4000/g' | \
+  #     kubectl apply -f -
+  #   kubectl rollout restart deployment -n ess ess-haproxy
   haproxy:
     replicas: 1
     resources:
