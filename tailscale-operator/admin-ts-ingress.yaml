@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-tailscale
+  namespace: ess
+  annotations:
+    tailscale.com/tags: "tag:matrix"
+spec:
+  ingressClassName: tailscale
+  rules:
+  - host: admin
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ess-element-admin
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - admin
+
