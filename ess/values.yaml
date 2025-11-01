@@ -77,23 +77,9 @@ matrix-stack:
         cpu: "500m"
     
     # Custom MAS configuration (config.yaml additions)
-    additional:
-      0-email:
-        config: |
-          email:
-            from: "matrix@rmsz005.com"
-            reply_to: "no-reply@rmsz005.com"
-            transport: smtp
-            smtp:
-              mode: starttls
-              hostname: smtp-relay.brevo.com
-              port: 587
-              username:
-                secret: ess-smtp-secret
-                key: username
-              password:
-                secret: ess-smtp-secret
-                key: password
+    # Email temporarily disabled - will configure after deployment
+    # Users can be created via: kubectl exec -it deploy/ess-matrix-authentication-service -- mas-cli manage register-user
+    additional: {}
 
   # Element Web - Matrix client
   elementWeb:
