@@ -1,0 +1,27 @@
+---
+# Tailscale LoadBalancer Service that proxies HTTPS traffic to nginx ingress
+# This allows external Tailscale devices to access mrtc.internal.rmsz005.com
+# Traffic flow: Client → Tailscale IP (100.x) → nginx ingress → ESS services
+# TLS is terminated by nginx (with Let's Encrypt cert for *.internal.rmsz005.com)
+# NOTE: Must be in ingress-nginx namespace to select nginx pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: mrtc-internal-tailscale
+  namespace: ingress-nginx
+  annotations:
+    tailscale.com/hostname: "mrtc-internal"
+    tailscale.com/tags: "tag:k8s"
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  selector:
+    # Point to nginx ingress controller pods (same selector as ingress-nginx service)
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
