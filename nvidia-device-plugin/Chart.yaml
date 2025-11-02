@@ -5,6 +5,6 @@ description: NVIDIA GPU Device Plugin for Kubernetes
 version: 1.0.0
 dependencies:
   - name: nvidia-device-plugin
-    version: 0.16.2
+    version: 0.18.0
     repository: https://nvidia.github.io/k8s-device-plugin
 
