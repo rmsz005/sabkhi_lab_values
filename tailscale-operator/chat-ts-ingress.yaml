@@ -1,26 +1,27 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+# Tailscale LoadBalancer Service that proxies HTTPS traffic to nginx ingress
+# This allows external Tailscale devices to access chat.internal.rmsz005.com
+# Traffic flow: Client → Tailscale IP (100.x) → nginx ingress → ESS services
+# TLS is terminated by nginx (with Let's Encrypt cert for *.internal.rmsz005.com)
+apiVersion: v1
+kind: Service
 metadata:
-  name: chat-tailscale
+  name: chat-internal-tailscale
   namespace: ess
   annotations:
+    tailscale.com/hostname: "chat-internal"
     tailscale.com/tags: "tag:k8s"
 spec:
-  ingressClassName: tailscale
-  rules:
-  - host: chat
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ess-element-web
-            port:
-              number: 80
-  tls:
-  - hosts:
-    - chat
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  selector:
+    # Point to nginx ingress controller pods (same selector as ingress-nginx service)
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
 
 
