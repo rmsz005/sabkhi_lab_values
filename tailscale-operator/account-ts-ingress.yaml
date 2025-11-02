@@ -7,7 +7,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: account-internal-tailscale
-  namespace: ess
+  namespace: ingress-nginx
   annotations:
     tailscale.com/hostname: "account-internal"
     tailscale.com/tags: "tag:k8s"

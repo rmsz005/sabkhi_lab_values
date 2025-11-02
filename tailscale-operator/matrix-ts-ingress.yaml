@@ -7,7 +7,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: matrix-internal-tailscale
-  namespace: ess
+  namespace: ingress-nginx
   annotations:
     tailscale.com/hostname: "matrix-internal"
     tailscale.com/tags: "tag:k8s"
