@@ -22,7 +22,7 @@ spec:
         fsGroup: 999
       containers:
       - name: postgresql
-        image: tensorchord/pgvecto-rs:pg15-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+        image: tensorchord/pgvecto-rs:pg15-v0.2.0@sha256:104a26ad4d0446c54a46d3a694c6193ef018c5ad4f9d9faf7765ab09cb9ffe06
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: false  # PostgreSQL needs write access
